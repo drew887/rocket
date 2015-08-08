@@ -4,18 +4,18 @@
 
 using namespace anGL;
 
-anGL::Shader::Shader() {
+Shader::Shader() {
     shaderID = shaderType = 0;
 }
 
-anGL::Shader::~Shader() {
+Shader::~Shader() {
     glDeleteShader(shaderID);
 }
 
 #include <vector>
 #include <fstream>
 using namespace std;
-bool anGL::Shader::load(string path, int type) {
+bool Shader::load(string path, int type) {
     bool result = true;
     fstream fin;
     string shader;
@@ -35,8 +35,6 @@ bool anGL::Shader::load(string path, int type) {
         if(compileStatus == GL_FALSE) {
             GLint maxLength = 0;
             glGetShaderiv(shaderID, GL_INFO_LOG_LENGTH, &maxLength);
-
-            //The maxLength includes the NULL character
             std::vector<GLchar> infoLog(maxLength);
             glGetShaderInfoLog(shaderID, maxLength, &maxLength, &infoLog[0]);
             FILE * pp = fopen("Shaderlog.txt", "a+");

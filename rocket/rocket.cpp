@@ -4,8 +4,7 @@
 
 #include "angl.h"
 #include "Program.h"
-
-#include <stdio.h>
+#include "Matrix.h"
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
@@ -37,18 +36,26 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
 
     float verts[] = {
         -0.5, -0.5,
-        0.0, 0.5,
+        0.0, 0.5*sqrtf(0.5), //an equalateral triangle
         0.5, -0.5
     };
+    Matrix world;
+    world.perspective(90, 640 / 480.f, 0.2, 10);
+    Matrix model;
+    model.rotate(90, 0, 0, 1);
     glGenVertexArrays(1, &vao);
     glBindVertexArray(vao);
     glGenBuffers(1, &vbo);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glBufferData(GL_ARRAY_BUFFER, 6 * sizeof(GLfloat), verts, GL_STATIC_DRAW);
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, 0);
+    int uniformWorld = glGetUniformLocation(prog.programID, "world");
+    glUniformMatrix4fv(uniformWorld, 1, GL_FALSE, world.matrix);
+    uniformWorld = glGetUniformLocation(prog.programID, "model");
+    glUniformMatrix4fv(uniformWorld, 1, GL_FALSE, model.matrix);
     glEnableVertexAttribArray(0);
     glBindVertexArray(0);
-
+    
     glClearColor(0.0, 1.0, 1.0, 1.0);
     while(GetMessage(&msg, NULL, 0, 0) > 0) {
         render();

@@ -8,7 +8,6 @@ using std::vector;
 
 namespace anGL {
     class Program {
-
     public:
         Program();
         ~Program();

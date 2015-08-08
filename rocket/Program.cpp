@@ -3,19 +3,19 @@
 
 using namespace anGL;
 
-anGL::Program::Program(){
+Program::Program(){
     programID = glCreateProgram();
 }
 
 
-anGL::Program::~Program(){
+Program::~Program(){
     for(unsigned int ctr = 0; ctr < shaders.size(); ctr++) {
         glDetachShader(programID, shaders[ctr]  );
     }
     glDeleteProgram(programID);
 }
 
-bool anGL::Program::linkProgram() {
+bool Program::linkProgram() {
     bool result = true;
     glLinkProgram(programID);
     int linkStatus;
@@ -26,6 +26,6 @@ bool anGL::Program::linkProgram() {
     return result;
 }
 
-void anGL::Program::attachShader(Shader * shader) {
+void Program::attachShader(Shader * shader) {
     glAttachShader(programID, shader->shaderID);
 }
