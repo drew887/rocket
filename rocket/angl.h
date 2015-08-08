@@ -3,11 +3,12 @@
 #define ANGL_H
 
 #include <Windows.h>
-#include <gl\gl.h>
+#include <gl\glew.h>
+#include <gl\wglew.h>
 
 namespace anGL {
 
-    int createOpenGLWin(HINSTANCE hInstance, const wchar_t * windowName, int width, int height, LRESULT(CALLBACK *windowCallback)(HWND, UINT, WPARAM, LPARAM));
+    HWND createOpenGLWin(HINSTANCE hInstance, const wchar_t * windowName, int width, int height, LRESULT(CALLBACK *windowCallback)(HWND, UINT, WPARAM, LPARAM));
 }
 
 #endif

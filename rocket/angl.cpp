@@ -2,7 +2,7 @@
 
 using namespace anGL;
 
-int anGL::createOpenGLWin(HINSTANCE hInstance, const wchar_t * windowName, int width, int height, LRESULT(CALLBACK *windowCallback)(HWND, UINT, WPARAM, LPARAM)) {
+HWND anGL::createOpenGLWin(HINSTANCE hInstance, const wchar_t * windowName, int width, int height, LRESULT(CALLBACK *windowCallback)(HWND, UINT, WPARAM, LPARAM)) {
     WNDCLASS windowClass = { 0 };
     windowClass.hInstance = hInstance;
     windowClass.lpszClassName = windowName;
@@ -12,7 +12,7 @@ int anGL::createOpenGLWin(HINSTANCE hInstance, const wchar_t * windowName, int w
 
     if(!RegisterClass(&windowClass)) {
         MessageBoxA(0, "Couldn't register window class!", "Error", 0);
-        return -1;
+        return 0;
     }
     HWND windowHandle = CreateWindowW(windowClass.lpszClassName, windowClass.lpszClassName,
         WS_OVERLAPPEDWINDOW | WS_VISIBLE,
@@ -24,7 +24,7 @@ int anGL::createOpenGLWin(HINSTANCE hInstance, const wchar_t * windowName, int w
 
     if(!windowHandle) {
         MessageBoxA(0, "Couldn't create window!", "Error", 0);
-        return -1;
+        return 0;
     }
 
     PIXELFORMATDESCRIPTOR pixelDescription = {
@@ -52,9 +52,30 @@ int anGL::createOpenGLWin(HINSTANCE hInstance, const wchar_t * windowName, int w
 
     if(!SetPixelFormat(windowDC, givenFormat, &pixelDescription)) {
         MessageBoxA(0, "No Matching PFD found!", "Error", 0);
-        return -1;
+        return 0;
     }
 
-    return 0;
+    HGLRC openGLContext = wglCreateContext(windowDC);
+    wglMakeCurrent(windowDC, openGLContext);
+    
+    GLenum err = glewInit();
+    if(GLEW_OK != err) {
+        MessageBoxA(0, "Error with glew!", "Error", 0);
+        return 0;
+    }
+
+    int ourGLAttributes[] =
+    {
+        WGL_CONTEXT_MAJOR_VERSION_ARB, 3,
+        WGL_CONTEXT_MINOR_VERSION_ARB, 2,
+        WGL_CONTEXT_FLAGS_ARB, 0,
+        0
+    };
+    wglMakeCurrent(NULL, NULL);
+    wglDeleteContext(openGLContext);
+    openGLContext = wglCreateContextAttribsARB(windowDC, 0, ourGLAttributes);
+    wglMakeCurrent(windowDC, openGLContext);
+
+    return windowHandle;
 }
 
