@@ -110,15 +110,19 @@ void Matrix::orthographic(float top, float bottom, float left, float right, floa
 }
 
 void Matrix::scale(float x, float y, float z) {
-    matrix[0] += x;
-    matrix[5] += y;
-    matrix[10] += z;
+    Matrix temp;
+    temp.matrix[0] += x;
+    temp.matrix[5] += y;
+    temp.matrix[10] += z;
+    *this = temp * *this;
 }
 
 void Matrix::translate(float x, float y, float z) {
+    Matrix temp;
     matrix[12] += x;
     matrix[13] += y;
     matrix[14] += z;
+    *this = temp * *this;
 }
 
 void Matrix::rotate(float rot, float rx, float ry, float rz) {
@@ -127,21 +131,21 @@ void Matrix::rotate(float rot, float rx, float ry, float rz) {
     s = sinf(rad);
     c = cosf(rad);
     t = 1 - cosf(rad);
-
-    matrix[0] = (t * (rx*rx)) + c;//the diagonals
-    matrix[5] = (t * (ry*ry)) + c;
-    matrix[10] = (t * (rz*rz)) + c;
+    Matrix result;
+    result.matrix[0] = (t * (rx*rx)) + c;//the diagonals
+    result.matrix[5] = (t * (ry*ry)) + c;
+    result.matrix[10] = (t * (rz*rz)) + c;
     //set up the xplane
-    matrix[4] = (t * (rx*ry)) - (s*rz);
-    matrix[8] = (t * (rx*rz)) + (s*ry);
+    result.matrix[4] = (t * (rx*ry)) - (s*rz);
+    result.matrix[8] = (t * (rx*rz)) + (s*ry);
     //set up the yplane
-    matrix[1] = (t * (rx*ry)) + (s*rz);
-    matrix[9] = (t * (ry*rz)) - (s*rx);
+    result.matrix[1] = (t * (rx*ry)) + (s*rz);
+    result.matrix[9] = (t * (ry*rz)) - (s*rx);
     //set up zplane
-    matrix[2] = (t * (rx*rz)) - (s*ry);
-    matrix[6] = (t * (ry*rz)) + (s*rx);
+    result.matrix[2] = (t * (rx*rz)) - (s*ry);
+    result.matrix[6] = (t * (ry*rz)) + (s*rx);
     //*this *= temp;
-
+    *this = result * *this;
 }
 
 

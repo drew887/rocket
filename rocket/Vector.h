@@ -1,0 +1,45 @@
+#pragma once
+#ifndef ANGL_VECTOR_H
+#define ANGL_VECTOR_H
+namespace anGL {
+
+    class Vector{
+
+    public:
+        Vector(float X = 0., float Y = 0., float Z = 0., float W = 1.);
+        ~Vector();
+
+        //vector ops
+        Vector& operator=(const Vector& other);
+        Vector operator+(const Vector& other);
+        Vector& operator+=(const Vector& other);
+        Vector operator-(const Vector& other);
+        Vector& operator-=(const Vector& other);
+        Vector operator*(const Vector& other);
+        Vector& operator*=(const Vector& other);
+        Vector operator/(const Vector& other);
+        Vector& operator/=(const Vector& other);
+
+        //scalar ops
+        Vector operator+(float rhs);
+        Vector& operator+=(float rhs);
+        Vector operator-(float rhs);
+        Vector& operator-=(float rhs);
+        Vector operator*(float rhs);
+        Vector& operator*=(float rhs);
+        Vector operator/(float rhs);
+        Vector& operator/=(float rhs);
+
+        float dot(const Vector other) const; //dot product as if a 3 point vector
+        float dot4(const Vector other) const; //full 4 point dot product
+        Vector cross(const Vector other) const;
+
+        float points[4];
+        float &x, &y, &z, &w;
+
+    };
+
+    float dot(const Vector one, const Vector two, bool dot4 = false);
+    Vector cross(const Vector one, const Vector two);
+}
+#endif

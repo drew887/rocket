@@ -20,16 +20,20 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="angl.cpp" />
+    <ClCompile Include="BasicQuad.cpp" />
     <ClCompile Include="Matrix.cpp" />
     <ClCompile Include="Program.cpp" />
     <ClCompile Include="rocket.cpp" />
     <ClCompile Include="Shader.cpp" />
+    <ClCompile Include="Vector.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="angl.h" />
+    <ClInclude Include="BasicQuad.h" />
     <ClInclude Include="Matrix.h" />
     <ClInclude Include="Program.h" />
     <ClInclude Include="Shader.h" />
+    <ClInclude Include="Vector.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="fragment.glsl" />
