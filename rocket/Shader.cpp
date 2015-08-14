@@ -37,7 +37,7 @@ bool Shader::load(string path, int type) {
             glGetShaderiv(shaderID, GL_INFO_LOG_LENGTH, &maxLength);
             std::vector<GLchar> infoLog(maxLength);
             glGetShaderInfoLog(shaderID, maxLength, &maxLength, &infoLog[0]);
-            FILE * pp = fopen("Shaderlog.txt", "a+");
+            FILE * pp = fopen("Shaderlog.txt", "w");
             for(auto i : infoLog) {
                 fprintf(pp, "%c", i);
             }

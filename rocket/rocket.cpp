@@ -18,14 +18,15 @@ HDC device;
 unsigned int vao, vbo, colorVBO;
 int uniformWorld;
 
-BasicQuad * quad;
-Matrix * triMod;
+BasicQuad * quad, * du;
+Matrix * triMod, * perMod = NULL;
 
 int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
 {
     MSG msg = { 0 };
-
-    HWND windowHandle = createOpenGLWin(hInstance, L"WindowTest", 640, 480, WndProc);
+#define winh 600
+#define winw 600
+    HWND windowHandle = createOpenGLWin(hInstance, L"WindowTest", winw, winh, WndProc);
     if(windowHandle == 0) { 
         return 1;
     }
@@ -38,54 +39,43 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
     prog.attachShader(&frag);
     prog.linkProgram();
     glUseProgram(prog.programID);
+    glEnable(GL_DEPTH_TEST);
 
-    
-    float verts[] = {
-        -0.5, -0.5,
-        0.0, 0.5*sqrtf(0.5), //an equalateral triangle
-        0.5, -0.5
-    };
-    float colours[] = {
-        1., 1., 0,
-        0., 1., 1.,
-        1., 0., 1.
-    };
     Matrix world;
-    world.perspective(90, 640 / 480.f, 0.2, 10);
-    Matrix model;
-    triMod = &model;
-    model.translate(-0.2, 0, -1);
-    model.rotate(90, 0, 0, 1);
-    model.scale(0.5, 0.5, 0);
-    glGenVertexArrays(1, &vao);
-    glBindVertexArray(vao);
-    glGenBuffers(1, &vbo);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo); 
-    glBufferData(GL_ARRAY_BUFFER, sizeof(verts), verts, GL_STATIC_DRAW);
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, 0);
-    glEnableVertexAttribArray(0);
-
-    glGenBuffers(1, &colorVBO);
-    glBindBuffer(GL_ARRAY_BUFFER, colorVBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(colours), colours, GL_STATIC_DRAW);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, 0);
-    glEnableVertexAttribArray(1);
-
+    world.perspective(90, 1, 0.2, 10);
+    //world.orthographic(10, -10, -10, 10, 0.2f, 10);
+    perMod = &world;
     uniformWorld = glGetUniformLocation(prog.programID, "world");
     glUniformMatrix4fv(uniformWorld, 1, GL_FALSE, world.matrix);
-    uniformWorld = glGetUniformLocation(prog.programID, "model");
-    glUniformMatrix4fv(uniformWorld, 1, GL_FALSE, model.matrix);
-    glBindVertexArray(0);
-    
-    BasicQuad one(2, 2, 0.f, 0.f, prog.programID);
+    BasicQuad one(2, 2, prog.programID);
     quad = &one;
-    //one.model.scale(0, 0.1, 0);
-    one.rot.rotate(45, 0, 0, 1);
-    one.trans.translate(-1, -1, -1);
+    one.model.scale(0.1, 0.1, 0);
+    //one.rot.rotate(-45, 0, 0, 1);
+    one.model.translate(-1, -1, -2);
 
-    glClearColor(0.0, 0.10, 1.0, 1.0);
+    BasicQuad two(2, 2, prog.programID);
+    du = &two;
+    two.model.translate(-1, -3, -2);
+    two.model.rotate(90, 0, 0, 1);
+    
+    glClearColor(0.5, 0.5, 0.5, 1.0);
     while(GetMessage(&msg, NULL, 0, 0) > 0) {
         render();
+        GLenum errCode;
+        const char *errString;
+        if((errCode = glGetError()) != GL_NO_ERROR) {
+            string error = "none";
+            switch(errCode) {
+            case GL_INVALID_OPERATION:      error = "INVALID_OPERATION";      break;
+            case GL_INVALID_ENUM:           error = "INVALID_ENUM";           break;
+            case GL_INVALID_VALUE:          error = "INVALID_VALUE";          break;
+            case GL_OUT_OF_MEMORY:          error = "OUT_OF_MEMORY";          break;
+            case GL_INVALID_FRAMEBUFFER_OPERATION:  error = "INVALID_FRAMEBUFFER_OPERATION";  break;
+            }
+
+            MessageBoxA(0, error.c_str(), "ERR", 0);
+        }
+        //PostQuitMessage(0);
         DispatchMessage(&msg);
     }
     return 0;
@@ -108,6 +98,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         break;
     case WM_SIZE:
         glViewport(0, 0, LOWORD(lParam), HIWORD(lParam));
+        if(perMod) {
+            perMod->perspective(90, LOWORD(lParam) / ((float)HIWORD(lParam)), 0.2f, 10);
+        }
         break;
     default:
         return DefWindowProc(hWnd, message, wParam, lParam);
@@ -118,10 +111,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 void render() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glUniformMatrix4fv(uniformWorld, 1, GL_FALSE, perMod->matrix);
     quad->Render();
-    glBindVertexArray(vao);
-    glUniformMatrix4fv(uniformWorld, 1, GL_FALSE, triMod->matrix);
-    glDrawArrays(GL_TRIANGLES, 0, 3);
-    glBindVertexArray(0);
+    du->Render();
     SwapBuffers(device);
 }
