@@ -3,10 +3,12 @@
 using namespace anGL;
 
 BasicQuad::BasicQuad(float width, float height, int programID) {
+    width /= 2;
+    height /= 2;
     verticies = new float[8]{
-        0, 0,
-        width, 0,
-        0, height,
+        -width, -height,
+        width, -height,
+        -width, height,
         width, height
     };
     float texts[] = {
@@ -18,11 +20,10 @@ BasicQuad::BasicQuad(float width, float height, int programID) {
 
     int current = 0;
     glGetIntegerv(GL_VERTEX_ARRAY_BINDING, &current);
-    glBindVertexArray(0);
-    glGenVertexArrays(1, &vertexArrayID);
     glBindVertexArray(vertexArrayID);
-    bool loaded = texture.load("type.bmp");
-    glGenBuffers(1, &vertexBufferID);
+    
+    texture.load("type.bmp");
+
     glBindBuffer(GL_ARRAY_BUFFER, vertexBufferID);
     glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 8, verticies, GL_STATIC_DRAW);
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, 0);
@@ -37,7 +38,6 @@ BasicQuad::BasicQuad(float width, float height, int programID) {
     if(programID >= 0) {
         modelLoc = glGetUniformLocation(programID, "model");
         sampleLoc = glGetUniformLocation(programID, "sample");
-        //glUniformMatrix4fv(modelLoc, 1, GL_FALSE, model.matrix);
     }
     
     
@@ -45,14 +45,7 @@ BasicQuad::BasicQuad(float width, float height, int programID) {
 }
 
 BasicQuad::~BasicQuad() {
-    delete[] verticies;
-    //int current;
-    //glGetIntegerv(GL_VERTEX_ARRAY_BINDING, &current);
-    //glBindVertexArray(0);
-    glDeleteBuffers(1, &vertexBufferID);
     glDeleteBuffers(1, &texCoordBufferID);
-    glDeleteVertexArrays(1, &vertexArrayID);
-    //glBindVertexArray(current);
 }
 
 void BasicQuad::Render() {

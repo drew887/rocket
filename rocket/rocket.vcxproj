@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="angl.cpp" />
+    <ClCompile Include="BasicPrimitive.cpp" />
     <ClCompile Include="BasicQuad.cpp" />
     <ClCompile Include="Matrix.cpp" />
     <ClCompile Include="Program.cpp" />
@@ -30,6 +31,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="angl.h" />
+    <ClInclude Include="BasicPrimitive.h" />
     <ClInclude Include="BasicQuad.h" />
     <ClInclude Include="Matrix.h" />
     <ClInclude Include="Program.h" />

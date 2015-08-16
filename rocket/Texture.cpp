@@ -1,7 +1,7 @@
 #include "Texture.h"
 #include <stdio.h>
 #include <gl\glew.h>
-
+#include <assert.h>
 
 #pragma pack(1)
 
@@ -31,12 +31,13 @@ struct BitmapInfoHeader {//Bitmap Info Header
 
 
 Texture::Texture(string location) {
-    //glGenTextures(1, &texID);
+    glGenTextures(1, &texID);
     load(location);
 }
 
 Texture::Texture(){
-    //glGenTextures(1, &texID);
+    glGenTextures(1, &texID);
+    loaded = false;
 }
 
 Texture::~Texture() {
@@ -44,38 +45,69 @@ Texture::~Texture() {
 }
 
 
-bool Texture::load(string location){
-    bool loaded = false;
-    BMP image;
+bool Texture::load(string location) {
+    bool result = false;
     if(image.load(location)) {
-        glGenTextures(1, &texID);
         glBindTexture(GL_TEXTURE_2D, texID);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, image.width, image.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image.image);
-
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        setFilter(GL_NEAREST, GL_NEAREST);
+        setWrap(GL_CLAMP_TO_BORDER, GL_CLAMP_TO_BORDER);
         //glGenerateMipmap(GL_TEXTURE_2D);
-
-
-
-        //glGenSamplers(1, &samplerID);
-        loaded = true;
+        result = true;
     }
-    else {
-        exit(-1);
+    loaded = result;
+    return result;
+}
+
+void Texture::setImage(BMP& img){
+    assert(img.loaded);
+    if(img.loaded) {
+        image = img;
+        glBindTexture(GL_TEXTURE_2D, texID);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, image.width, image.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image.image);
     }
-    return loaded;
+}
+
+void Texture::setFilter(GLenum min, GLenum mag){
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, min);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, mag);
+}
+
+void Texture::setWrap(GLenum wrap_S, GLenum wrap_T){
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrap_S);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrap_T);
 }
 
 BMP::BMP() {
+    loaded = false;
+    image = NULL;
+    width = height = size = 0;
+}
+
+BMP::BMP(BMP & other){
+    if(other.loaded) {
+        width = other.width;
+        height = other.height;
+        size = width * height;
+        image = new uint32_t[size];
+        for(uint32_t x = 0; x < width; x++) {
+            for(uint32_t y = 0; y < width; y++) {
+                image[y + (x*width)] = other.image[y + (x*width)];
+            }
+        }
+        loaded = true;
+    }
+    else {
+        image = NULL;
+        width = height = size = 0;
+    }
 }
 
 BMP::BMP(string location) {
     if(!load(location)) { //error opening image, just create an empty 2 by 2 image
         image = NULL;
-        width = height = 0;
+        width = height = size = 0;
+        loaded = false;
     }
 }
 
@@ -90,12 +122,13 @@ bool BMP::load(string location) {
         fseek(fp, fileHeader.bitoffset, SEEK_SET);
         width = infoHeader.width;
         height = infoHeader.height;
-        this->image = new uint32_t[width * height];
-        uint8_t r, g, b, A = 0;
+        size = width * height;
+        this->image = new uint32_t[size];
+        uint8_t r, g, b, A = 0xFF;
         int invert = 0;
         for(uint32_t i = 0; i < height; i++) {
             for(uint32_t z = 0; z < width; z++) {
-                r, g, b, A = 0;
+                A = 0;
                 fread(&r, 1, 1, fp);
                 fread(&g, 1, 1, fp);
                 fread(&b, 1, 1, fp);
@@ -104,10 +137,52 @@ bool BMP::load(string location) {
             }
         }
         fclose(fp);
+        loaded = true;
         result = true;
     }
 
     return result;
+}
+
+BMP BMP::subImage(uint8_t startX, uint8_t startY, uint8_t subWidth, uint8_t subHeight){
+    BMP result;
+    assert(loaded);
+    assert((subWidth * subHeight < size));
+    if(loaded && (subWidth * subHeight < size)) {
+        result.width = subWidth;
+        result.height = subHeight;
+        result.size = subWidth * subHeight;
+        result.image = new uint32_t[result.size];
+        uint32_t * start = &image[startX+(startY*width)];
+        uint32_t stride = width - subWidth;
+        for(uint32_t yStride = 0; yStride < subWidth; yStride++) {
+            for(uint32_t xStride = 0; xStride < subWidth; xStride++) {
+                result.image[xStride + (yStride*subWidth)] = start[xStride + (yStride*stride)];
+            }
+        }
+        result.loaded = true;
+    }
+    return result;
+}
+
+BMP & BMP::operator=(BMP& other){
+    if(other.loaded) {
+        width = other.width;
+        height = other.height;
+        size = width * height;
+        delete[] image;
+        image = new uint32_t[size];
+        for(uint32_t x = 0; x < width; x++) {
+            for(uint32_t y = 0; y < width; y++) {
+                image[y + (x*width)] = other.image[y + (x*width)];
+            }
+        }
+    } else {
+        delete[] image;
+        image = NULL;
+        width = height = size = 0; 
+    }
+    return *this;
 }
 
 BMP::~BMP() {

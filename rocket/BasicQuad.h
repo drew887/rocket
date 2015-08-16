@@ -1,20 +1,19 @@
 #pragma once
 #ifndef ANGL_BASICQUAD_H
 #define ANGL_BASICQUAD_H
-#include "Matrix.h"
 #include "Texture.h"
+#include "BasicPrimitive.h"
+
 namespace anGL {
-    class BasicQuad {
+    class BasicQuad : public BasicPrimitive {
     protected:
-        float * verticies;
-        unsigned int vertexBufferID, texCoordBufferID, vertexArrayID;
+        unsigned int texCoordBufferID;
     public:
         BasicQuad(float width, float height,  int uniformLoc = -1);
         virtual ~BasicQuad();
         virtual void Render();
-        Matrix model, trans, rot, scale;
         Texture texture;
-        int modelLoc, sampleLoc;
+        int sampleLoc;
     };
 }
 

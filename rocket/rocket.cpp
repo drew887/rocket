@@ -21,9 +21,7 @@ int uniformWorld;
 BasicQuad * quad, * du;
 Matrix * triMod, * perMod = NULL;
 
-int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
-{
-    MSG msg = { 0 };
+int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd) {
 #define winh 600
 #define winw 600
     HWND windowHandle = createOpenGLWin(hInstance, L"WindowTest", winw, winh, WndProc);
@@ -40,51 +38,62 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
     prog.linkProgram();
     glUseProgram(prog.programID);
     glEnable(GL_DEPTH_TEST);
+    glEnable(GL_CULL_FACE);
 
     Matrix world;
-    world.perspective(90, 1, 0.2, 10);
-    //world.orthographic(10, -10, -10, 10, 0.2f, 10);
+    world.perspective(90, 1, 0.2f, 10);
+    //world.orthographic(4, -4, -4, 4, 0.2, 10);
     perMod = &world;
     uniformWorld = glGetUniformLocation(prog.programID, "world");
     glUniformMatrix4fv(uniformWorld, 1, GL_FALSE, world.matrix);
+    
     BasicQuad one(2, 2, prog.programID);
     quad = &one;
-    one.model.scale(0.1, 0.1, 0);
-    //one.rot.rotate(-45, 0, 0, 1);
-    one.model.translate(-1, -1, -2);
+    one.model.scale(0.1f, 0.1f, 0);
+    one.model.translate(0, 0, -5);
 
     BasicQuad two(2, 2, prog.programID);
     du = &two;
-    two.model.translate(-1, -3, -2);
-    two.model.rotate(90, 0, 0, 1);
-    
-    glClearColor(0.5, 0.5, 0.5, 1.0);
-    while(GetMessage(&msg, NULL, 0, 0) > 0) {
-        render();
-        GLenum errCode;
-        const char *errString;
-        if((errCode = glGetError()) != GL_NO_ERROR) {
-            string error = "none";
-            switch(errCode) {
-            case GL_INVALID_OPERATION:      error = "INVALID_OPERATION";      break;
-            case GL_INVALID_ENUM:           error = "INVALID_ENUM";           break;
-            case GL_INVALID_VALUE:          error = "INVALID_VALUE";          break;
-            case GL_OUT_OF_MEMORY:          error = "OUT_OF_MEMORY";          break;
-            case GL_INVALID_FRAMEBUFFER_OPERATION:  error = "INVALID_FRAMEBUFFER_OPERATION";  break;
-            }
+    two.texture.load("1type.bmp");
+    two.model.translate(0, 0, -1);
 
-            MessageBoxA(0, error.c_str(), "ERR", 0);
+    BMP col("col.bmp"), bol("1type.bmp");
+    BMP test = col.subImage(8, 4, 8, 8);
+    two.texture.setImage(col);
+
+    MSG msg = { 0 };
+
+    bool forward = true;
+    glClearColor(0.8f, 0.8f, 0.8f, 1.0f);
+    bool loop = true;
+    Vector oneMove(0, 0, 0.1);
+    while(loop) {
+        render();
+        if(one.position.z >= -1.5f) {
+            oneMove.z = -0.1;
+            two.texture.setImage(bol);
         }
-        //PostQuitMessage(0);
-        DispatchMessage(&msg);
+        else if(one.position.z <= -6.f) {
+            oneMove.z = 0.1;
+            two.texture.setImage(col);
+        }
+        one.Translate(oneMove);
+
+        two.Rotate(3, 0, 0, 1);
+        Sleep(16);
+        while(PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
+            if(msg.message == WM_QUIT) {
+                loop = false;
+            }
+            DispatchMessage(&msg);
+        }
     }
     return 0;
 }
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-    switch(message)
-    {
+    switch(message) {
     case WM_CLOSE:
         PostQuitMessage(0);
         break;

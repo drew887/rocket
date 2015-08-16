@@ -7,6 +7,7 @@ HWND anGL::createOpenGLWin(HINSTANCE hInstance, const wchar_t * windowName, int 
     windowClass.hInstance = hInstance;
     windowClass.lpszClassName = windowName;
     windowClass.hbrBackground = (HBRUSH)COLOR_BACKGROUND;
+    windowClass.hCursor = LoadCursor(NULL, IDC_ARROW);
     windowClass.style = CS_OWNDC;
     windowClass.lpfnWndProc = windowCallback;
 
