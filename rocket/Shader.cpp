@@ -14,7 +14,12 @@ Shader::~Shader() {
 
 #include <vector>
 #include <fstream>
+
 using namespace std;
+/*!
+    \param type either GL_VERTEX_SHADER or GL_FRAGMENT_SHADER
+    Reads in a file at path, creates an openGL shader object, and then compiles it
+*/
 bool Shader::load(string path, int type) {
     bool result = true;
     fstream fin;

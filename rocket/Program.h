@@ -7,6 +7,7 @@
 using std::vector;
 
 namespace anGL {
+    //! A basic representation of an openGL program object
     class Program {
     public:
         Program();

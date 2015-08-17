@@ -6,6 +6,7 @@
 using namespace anGL;
 
 #pragma pack(1)
+//! Represents info about the bmp file itself
 struct BitmapFileInfo { 				//Bitmap File Header
     int8_t type[2];			//this is the BM info;
     uint32_t size;		//file size;
@@ -16,6 +17,7 @@ struct BitmapFileInfo { 				//Bitmap File Header
 #pragma pack()
 
 #pragma pack(1)
+//! Represents the info header stored inside the bmp that describes the image
 struct BitmapInfoHeader {//Bitmap Info Header
     uint32_t headersize;	//size of this data in the file 40 bytes
     uint32_t width, height;	//self explainitory;
@@ -145,6 +147,16 @@ bool BMP::load(string location) {
     return result;
 }
 
+/*!
+    \param startX starting point in the X direction of this image
+    \param startY starting point in the Y direction of this image
+    \param subWidth the width of the new image
+    \param subHeight the height of the new image
+
+    returns an empty image if startX + subWidth is larger than this instance's width,
+    same thing for the height or if subWidth * subHeight is larger than the image's size
+*/
+
 BMP BMP::subImage(uint32_t startX, uint32_t startY, uint32_t subWidth, uint32_t subHeight){
     BMP result;
     assert(loaded);
@@ -168,6 +180,9 @@ BMP BMP::subImage(uint32_t startX, uint32_t startY, uint32_t subWidth, uint32_t 
     return result;
 }
 
+/*!
+    if other.loaded is true does a full copy, otherwise free's image and sets everything to 0
+*/
 BMP & BMP::operator=(BMP& other){
     if(other.loaded) {
         width = other.width;

@@ -6,8 +6,10 @@
 #include "Vector.h"
 
 namespace anGL {
+    //! An abstract class representing a basic polygon
     class BasicPrimitive {
     protected:
+        //! the array of verticies to be copied into GPU memory, allocated in child constructor
         float * verticies;
         unsigned int vertexBufferID, vertexArrayID;
     public:

@@ -1,7 +1,9 @@
 #include "BasicQuad.h"
 #include <gl\glew.h>
 using namespace anGL;
-
+/*!
+    Creates a quad centered around the origin
+*/
 BasicQuad::BasicQuad(float width, float height, int programID) {
     width /= 2;
     height /= 2;

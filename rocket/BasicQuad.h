@@ -5,6 +5,7 @@
 #include "BasicPrimitive.h"
 
 namespace anGL {
+    //! A basic texturable quad
     class BasicQuad : public BasicPrimitive {
     protected:
         unsigned int texCoordBufferID;

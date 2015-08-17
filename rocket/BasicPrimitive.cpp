@@ -3,12 +3,17 @@
 
 using namespace anGL;
 
+/**
+    Note that verticies isn't allocated in here, it is left to the child classes to allocate it
+*/
 BasicPrimitive::BasicPrimitive(){
     glGenVertexArrays(1, &vertexArrayID);
     glGenBuffers(1, &vertexBufferID);
 }
 
-
+/**
+    Note that verticies is deleted in here though
+*/
 BasicPrimitive::~BasicPrimitive(){
     delete[] verticies;
     glDeleteBuffers(1, &vertexBufferID);
