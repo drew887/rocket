@@ -65,6 +65,8 @@ void Texture::setImage(BMP& img){
         image = img;
         glBindTexture(GL_TEXTURE_2D, texID);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, image.width, image.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image.image);
+        /*setFilter(GL_NEAREST, GL_NEAREST);
+        setWrap(GL_CLAMP_TO_BORDER, GL_CLAMP_TO_BORDER);*/
     }
 }
 
@@ -90,7 +92,7 @@ BMP::BMP(BMP & other){
         height = other.height;
         size = width * height;
         image = new uint32_t[size];
-        for(uint32_t x = 0; x < width; x++) {
+        for(uint32_t x = 0; x < height; x++) {
             for(uint32_t y = 0; y < width; y++) {
                 image[y + (x*width)] = other.image[y + (x*width)];
             }
@@ -133,7 +135,7 @@ bool BMP::load(string location) {
                 fread(&g, 1, 1, fp);
                 fread(&b, 1, 1, fp);
                 invert = (height - 1) - i;
-                image[z + (i*width)] = (A << 24 | r << 16 | g << 8 | b);
+                image[z + (invert*width)] = (A << 24 | r << 16 | g << 8 | b);
             }
         }
         fclose(fp);
@@ -144,20 +146,22 @@ bool BMP::load(string location) {
     return result;
 }
 
-BMP BMP::subImage(uint8_t startX, uint8_t startY, uint8_t subWidth, uint8_t subHeight){
+BMP BMP::subImage(uint32_t startX, uint32_t startY, uint32_t subWidth, uint32_t subHeight){
     BMP result;
     assert(loaded);
-    assert((subWidth * subHeight < size));
-    if(loaded && (subWidth * subHeight < size)) {
+    assert((subWidth * subHeight <= size));
+    assert(startX + subWidth <= width);
+    assert(startY + subHeight <= height);
+    if(loaded && (subWidth * subHeight <= size)) {
         result.width = subWidth;
         result.height = subHeight;
         result.size = subWidth * subHeight;
         result.image = new uint32_t[result.size];
         uint32_t * start = &image[startX+(startY*width)];
         uint32_t stride = width - subWidth;
-        for(uint32_t yStride = 0; yStride < subWidth; yStride++) {
+        for(uint32_t yStride = 0; yStride < subHeight; yStride++) {
             for(uint32_t xStride = 0; xStride < subWidth; xStride++) {
-                result.image[xStride + (yStride*subWidth)] = start[xStride + (yStride*stride)];
+                result.image[xStride + (yStride*subWidth)] = start[xStride + (yStride*stride)+(yStride*subWidth)];
             }
         }
         result.loaded = true;
@@ -172,7 +176,7 @@ BMP & BMP::operator=(BMP& other){
         size = width * height;
         delete[] image;
         image = new uint32_t[size];
-        for(uint32_t x = 0; x < width; x++) {
+        for(uint32_t x = 0; x < height; x++) {
             for(uint32_t y = 0; y < width; y++) {
                 image[y + (x*width)] = other.image[y + (x*width)];
             }

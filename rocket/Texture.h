@@ -13,7 +13,7 @@ public:
     BMP();
     BMP(BMP& other);
     bool load(string location);
-    BMP subImage(uint8_t startX, uint8_t startY, uint8_t width, uint8_t height);
+    BMP subImage(uint32_t startX, uint32_t startY, uint32_t width, uint32_t height);
     BMP& operator=(BMP& other);
 
     uint32_t width, height, size;

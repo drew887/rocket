@@ -7,6 +7,7 @@ namespace anGL {
 
     public:
         Vector(float X = 0., float Y = 0., float Z = 0., float W = 1.);
+        Vector(const Vector& other);
         ~Vector();
 
         //vector ops

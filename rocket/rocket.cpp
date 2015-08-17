@@ -49,37 +49,37 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
     
     BasicQuad one(2, 2, prog.programID);
     quad = &one;
-    one.model.scale(0.1f, 0.1f, 0);
+    //one.model.scale(0.1f, 0.1f, 0);
     one.model.translate(0, 0, -5);
 
-    BasicQuad two(2, 2, prog.programID);
+    BasicQuad two(1, 2, prog.programID);
     du = &two;
-    two.texture.load("1type.bmp");
+    two.texture.load("col.bmp");
     two.model.translate(0, 0, -1);
 
-    BMP col("col.bmp"), bol("1type.bmp");
-    BMP test = col.subImage(8, 4, 8, 8);
-    two.texture.setImage(col);
+    BMP col("col.bmp");
+    BMP test = col.subImage(0, 0, 8, 16);
+    two.texture.setImage(test);
 
     MSG msg = { 0 };
 
     bool forward = true;
     glClearColor(0.8f, 0.8f, 0.8f, 1.0f);
     bool loop = true;
-    Vector oneMove(0, 0, 0.1);
+    Vector oneMove(0, 0, 0.1f);
     while(loop) {
         render();
         if(one.position.z >= -1.5f) {
-            oneMove.z = -0.1;
-            two.texture.setImage(bol);
+            oneMove.z = -0.1f;
+            //two.texture.setImage(test);
         }
         else if(one.position.z <= -6.f) {
-            oneMove.z = 0.1;
-            two.texture.setImage(col);
+            oneMove.z = 0.1f;
+            //two.texture.setImage(col);
         }
         one.Translate(oneMove);
 
-        two.Rotate(3, 0, 0, 1);
+        //two.Rotate(3, 0, 0, 1);
         Sleep(16);
         while(PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
             if(msg.message == WM_QUIT) {

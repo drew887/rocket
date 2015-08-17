@@ -11,11 +11,17 @@ BasicQuad::BasicQuad(float width, float height, int programID) {
         -width, height,
         width, height
     };
-    float texts[] = {
+    /*float texts[] = {
         0, 0,
         1, 0,
         0, 1,
         1, 1
+    };*/
+   float texts[] = { //reversed tex coords 
+        0, 1,
+        1, 1,
+        0, 0,
+        1, 0
     };
 
     int current = 0;

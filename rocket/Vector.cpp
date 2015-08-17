@@ -9,10 +9,19 @@ Vector::Vector(float X, float Y, float Z, float W): x(points[0]), y(points[1]), 
     w = W;
 }
 
+anGL::Vector::Vector(const Vector & other) : x(points[0]), y(points[1]), z(points[2]), w(points[3]) {
+    x = other.x;
+    y = other.y;
+    z = other.z;
+    w = other.w;
+}
+
 Vector::~Vector(){
 
 }
-
+////        ////
+// Vector ops //
+////        ////
 Vector& Vector::operator=(const Vector & other) {
     for(int ctr = 0; ctr < 4; ctr++) {
         points[ctr] = other.points[ctr];
