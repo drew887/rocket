@@ -2,6 +2,14 @@
 
 using namespace anGL;
 
+/*!
+    \param identity number to set the base identity of the matrix to, by default 1.0f
+    note that the regular matrix looks like: (if i is identity)\n
+    i 0 0 0\n
+    0 i 0 0\n
+    0 0 i 0\n
+    0 0 0 i
+*/
 Matrix::Matrix(float identity) {
     matrix = new float[16];
     for(int i = 0; i < 16; i++) matrix[i] = 0;
@@ -81,6 +89,12 @@ float anGL::radtodeg(float rad) {
 ////        ////
 // View funcs //
 ////        ////
+/*!
+    \param fieldOfView a float representing how large to have the field of view, smaller numbers will have a zoom in effect
+    \param aspect a float representing the aspect ratio of the perspective, normally you want this to be your window width / height
+    \param near where the near clipping plane is
+    \param far where to stick the far clipping plane
+*/
 void Matrix::perspective(float fieldOfView, float aspect, float near, float far) {
     float tanOfView = tanf(fieldOfView / 2.0);
     matrix[0] = 1 / (aspect * tanOfView);
@@ -90,7 +104,13 @@ void Matrix::perspective(float fieldOfView, float aspect, float near, float far)
     matrix[14] = -2 * (far * near) / (far - near); //-2 for righthanded, switch these both positive to suddenly have left handed coordinates
     matrix[15] = 0;
 }
+/*!
+    \param near defines the near clipping plane
+    \param far defines the far clipping plane
 
+    top, bottom, left, and right define the lengths of the 4 sides of the view. Defines a view matrix that allows for depth perception,
+    although without a controlable field of view.
+*/
 void Matrix::frustum(float top, float bottom, float left, float right, float near, float far) {
     matrix[0] = (2 * near) / (right - left);
     matrix[5] = (2 * near) / (top - bottom);
@@ -101,7 +121,13 @@ void Matrix::frustum(float top, float bottom, float left, float right, float nea
     matrix[14] = -2 * (far * near) / (far - near);
     matrix[15] = 0;
 }
+/*!
+\param near defines the near clipping plane
+\param far defines the far clipping plane
 
+top, bottom, left, and right define the lengths of the 4 sides of the view. Defines a view matrix that doesn't allow for depth perception,
+no matter the depth all objects appear as if at the same depth
+*/
 void Matrix::orthographic(float top, float bottom, float left, float right, float near, float far) {
     matrix[0] = 2 / (right - left);
     matrix[5] = 2 / (top - bottom);

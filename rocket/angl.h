@@ -6,9 +6,9 @@
 #include <gl\glew.h>
 #include <gl\wglew.h>
 
-
+//! main namespace for Rocket
 namespace anGL {
-
+    //! used to create an openGL 3.3 window
     HWND createOpenGLWin(HINSTANCE hInstance, const wchar_t * windowName, int width, int height, LRESULT(CALLBACK *windowCallback)(HWND, UINT, WPARAM, LPARAM));
 }
 
