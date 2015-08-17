@@ -3,7 +3,7 @@
 #define ANGL_MATRIX_H
 
 
-//! a class for handling matricies!
+// a class for handling matricies!
 namespace anGL {
 
     class Matrix {
@@ -20,13 +20,16 @@ namespace anGL {
         void frustum(float top, float bottom, float left, float right, float nearPlane, float farPlane);
         void orthographic(float top, float bottom, float left, float right, float nearPlane, float farPlane);
 
+        void rotate(float rot, float x, float y, float z);
         void scale(float x, float y, float z);
         void translate(float x, float y, float z);
-        void rotate(float rot, float x, float y, float z);
-
+        
+        void setRotation(float rot, float x, float y, float z);
+        void setTranslation(float x, float y, float z);
+        void setScale(float x, float y, float z);
         float * matrix;
     protected:
-        void copy(const Matrix& o);
+        virtual void copy(const Matrix& o);
     };
 
     float degtorad(float deg);

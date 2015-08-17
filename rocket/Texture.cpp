@@ -3,8 +3,9 @@
 #include <gl\glew.h>
 #include <assert.h>
 
-#pragma pack(1)
+using namespace anGL;
 
+#pragma pack(1)
 struct BitmapFileInfo { 				//Bitmap File Header
     int8_t type[2];			//this is the BM info;
     uint32_t size;		//file size;
@@ -12,11 +13,9 @@ struct BitmapFileInfo { 				//Bitmap File Header
     int16_t empty2;		//reserved space;
     uint32_t bitoffset;		//4 bytes to tell us where the data is
 };
-
 #pragma pack()
 
 #pragma pack(1)
-
 struct BitmapInfoHeader {//Bitmap Info Header
     uint32_t headersize;	//size of this data in the file 40 bytes
     uint32_t width, height;	//self explainitory;

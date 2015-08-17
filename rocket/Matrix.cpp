@@ -78,6 +78,9 @@ float anGL::radtodeg(float rad) {
     return rad * (180 / PI);
 }
 
+////        ////
+// View funcs //
+////        ////
 void Matrix::perspective(float fieldOfView, float aspect, float near, float far) {
     float tanOfView = tanf(fieldOfView / 2.0);
     matrix[0] = 1 / (aspect * tanOfView);
@@ -109,12 +112,28 @@ void Matrix::orthographic(float top, float bottom, float left, float right, floa
     matrix[15] = 1;
 }
 
+  ////                   ////
+ // Transformation funcs  //
+////                   ////
+
+void anGL::Matrix::setScale(float x, float y, float z) {
+    matrix[0] = x;
+    matrix[5] = y;
+    matrix[10] = z;
+}
+
 void Matrix::scale(float x, float y, float z) {
     Matrix temp;
     temp.matrix[0] += x;
     temp.matrix[5] += y;
     temp.matrix[10] += z;
     *this = temp * *this;
+}
+
+void anGL::Matrix::setTranslation(float x, float y, float z) {
+    matrix[12] = x;
+    matrix[13] = y;
+    matrix[14] = z;
 }
 
 void Matrix::translate(float x, float y, float z) {
@@ -144,8 +163,25 @@ void Matrix::rotate(float rot, float rx, float ry, float rz) {
     //set up zplane
     result.matrix[2] = (t * (rx*rz)) - (s*ry);
     result.matrix[6] = (t * (ry*rz)) + (s*rx);
-    //*this *= temp;
     *this = result * *this;
 }
 
-
+void anGL::Matrix::setRotation(float rot, float rx, float ry, float rz){
+    float s, c, t;//sin cos and 1-cos constants
+    float rad = degtorad(rot);
+    s = sinf(rad);
+    c = cosf(rad);
+    t = 1 - cosf(rad);
+    matrix[0] = (t * (rx*rx)) + c;//the diagonals
+    matrix[5] = (t * (ry*ry)) + c;
+    matrix[10] = (t * (rz*rz)) + c;
+    //set up the xplane
+    matrix[4] = (t * (rx*ry)) - (s*rz);
+    matrix[8] = (t * (rx*rz)) + (s*ry);
+    //set up the yplane
+    matrix[1] = (t * (rx*ry)) + (s*rz);
+    matrix[9] = (t * (ry*rz)) - (s*rx);
+    //set up zplane
+    matrix[2] = (t * (rx*rz)) - (s*ry);
+    matrix[6] = (t * (ry*rz)) + (s*rx);
+}
