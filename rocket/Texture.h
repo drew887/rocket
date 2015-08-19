@@ -12,8 +12,10 @@ namespace anGL {
         BMP(string location);
         BMP();
         BMP(BMP& other);
+        BMP(BMP&& other); //move constructor?
         bool load(string location);
         BMP subImage(uint32_t startX, uint32_t startY, uint32_t width, uint32_t height);
+        bool subImage(uint32_t * destination, uint32_t startX, uint32_t startY, uint32_t width, uint32_t height);
         BMP& operator=(BMP& other);
 
         uint32_t width, height, size;
@@ -23,7 +25,6 @@ namespace anGL {
     };
 
     class Texture {
-    protected:
     public:
         Texture(string location);
         Texture();
@@ -32,7 +33,7 @@ namespace anGL {
         void setImage(BMP& img);
         void setFilter(GLenum min, GLenum mag);
         void setWrap(GLenum wrap_S, GLenum wrap_T);
-        //void tile(uint8_t * tiles, uint32_t width, uint32_t height);
+        void tile(uint16_t * tiles, uint16_t width, uint16_t height, BMP * source = NULL);
 
         bool loaded;
         BMP image;

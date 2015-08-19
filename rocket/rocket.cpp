@@ -18,14 +18,14 @@ HDC device;
 unsigned int vao, vbo, colorVBO;
 int uniformWorld;
 
-BasicQuad * quad, * du;
-Matrix * triMod, * perMod = NULL;
+BasicQuad * quad, *du;
+Matrix * triMod, *perMod = NULL;
 
 int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd) {
 #define winh 600
 #define winw 600
     HWND windowHandle = createOpenGLWin(hInstance, L"WindowTest", winw, winh, WndProc);
-    if(windowHandle == 0) { 
+    if(windowHandle == 0) {
         return 1;
     }
     device = GetDC(windowHandle);
@@ -46,36 +46,33 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
     perMod = &world;
     uniformWorld = glGetUniformLocation(prog.programID, "world");
     glUniformMatrix4fv(uniformWorld, 1, GL_FALSE, world.matrix);
-    
+
     BasicQuad one(2, 2, prog.programID);
     quad = &one;
-    //one.model.scale(0.1f, 0.1f, 0);
     one.model.translate(0, 0, -5);
 
-    BasicQuad two(1, 2, prog.programID);
+    BasicQuad two(2, 2, prog.programID);
     du = &two;
     two.texture.load("col.bmp");
     two.model.translate(0, 0, -1);
 
-    BMP col("col.bmp");
-    BMP test = col.subImage(0, 0, 8, 16);
-    two.texture.setImage(test);
+    uint16_t map[4] = { 1, 2, 0, 3 };
+    unsigned short mapw = 2;
+    two.texture.tile(map, mapw, mapw);
 
     MSG msg = { 0 };
 
     bool forward = true;
-    glClearColor(0.8f, 0.8f, 0.8f, 1.0f);
+    glClearColor(0.0f, 0.8f, 0.8f, 1.0f);
     bool loop = true;
     Vector oneMove(0, 0, 0.1f);
     while(loop) {
         render();
         if(one.position.z >= -1.5f) {
             oneMove.z = -0.1f;
-            //two.texture.setImage(test);
         }
         else if(one.position.z <= -6.f) {
             oneMove.z = 0.1f;
-            //two.texture.setImage(col);
         }
         one.Translate(oneMove);
 
@@ -104,7 +101,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         wglMakeCurrent(NULL, NULL);
         wglDeleteContext(context);
     }
-        break;
+                     break;
     case WM_SIZE:
         glViewport(0, 0, LOWORD(lParam), HIWORD(lParam));
         if(perMod) {
