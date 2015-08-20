@@ -18,7 +18,7 @@ namespace anGL {
         bool subImage(uint32_t * destination, uint32_t startX, uint32_t startY, uint32_t width, uint32_t height);
         BMP& operator=(BMP& other);
 
-        uint32_t width, height, size;
+        uint32_t width, height, size, alphaMask;
         uint32_t * image;
         bool loaded;
         ~BMP();

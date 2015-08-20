@@ -64,8 +64,8 @@ void Texture::setImage(BMP& img) {
         image = img;
         glBindTexture(GL_TEXTURE_2D, texID);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, image.width, image.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image.image);
-        /*setFilter(GL_NEAREST, GL_NEAREST);
-        setWrap(GL_CLAMP_TO_BORDER, GL_CLAMP_TO_BORDER);*/
+        setFilter(GL_NEAREST, GL_NEAREST);
+        setWrap(GL_CLAMP_TO_BORDER, GL_CLAMP_TO_BORDER);
     }
 }
 
@@ -91,8 +91,9 @@ void Texture::tile(uint8_t tileSize, uint16_t * tiles, uint16_t width, uint16_t 
     result.image = new uint32_t[result.size];
     uint32_t * tile = new uint32_t[tileSize * tileSize];
     source->subImage(tile, 0, 0, tileSize, tileSize);
-    uint32_t current, xPlace, yPlace, tileX, tileY, tileNo = 0;
+    uint32_t current, xPlace, yPlace, tileX, tileY, tileNo = 0, numTiles = source->size / (tileSize*tileSize);
     for(uint16_t currentTile = 0; currentTile < height * width; currentTile++) {
+        assert(tiles[currentTile] < numTiles);
         current = 0;
         xPlace = tileSize * (currentTile % width);
         yPlace = currentTile / width*tileSize;
@@ -115,6 +116,7 @@ BMP::BMP() {
     loaded = false;
     image = NULL;
     width = height = size = 0;
+    alphaMask = 0xFF00FF;
 }
 
 BMP::BMP(BMP & other) {
@@ -122,6 +124,7 @@ BMP::BMP(BMP & other) {
         width = other.width;
         height = other.height;
         size = width * height;
+        alphaMask = other.alphaMask;
         image = new uint32_t[size];
         for(uint32_t x = 0; x < height; x++) {
             for(uint32_t y = 0; y < width; y++) {
@@ -140,6 +143,7 @@ BMP::BMP(BMP && other) {
     width = other.width;
     height = other.height;
     size = width * height;
+    alphaMask = other.alphaMask;
     image = other.image;
     loaded = other.loaded;
     other.image = NULL;
@@ -148,6 +152,7 @@ BMP::BMP(BMP && other) {
 }
 
 BMP::BMP(string location) {
+    alphaMask = 0xFF00FF;
     if(!load(location)) { //error opening image, just create an empty 2 by 2 image
         image = NULL;
         width = height = size = 0;
@@ -172,10 +177,15 @@ bool BMP::load(string location) {
         int invert = 0;
         for(uint32_t i = 0; i < height; i++) {
             for(uint32_t z = 0; z < width; z++) {
-                A = 0;
                 fread(&r, 1, 1, fp);
                 fread(&g, 1, 1, fp);
                 fread(&b, 1, 1, fp);
+                if((r << 16 | g << 8 | b) == alphaMask) {
+                    A = 0;
+                }
+                else {
+                    A = 0xFF;
+                }
                 invert = (height - 1) - i;
                 image[z + (invert*width)] = (A << 24 | r << 16 | g << 8 | b);
             }

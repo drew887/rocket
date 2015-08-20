@@ -7,6 +7,8 @@
 #include "Matrix.h"
 #include "BasicQuad.h"
 
+#include <time.h>
+
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
 void render();
@@ -46,10 +48,12 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
     glUseProgram(prog.programID);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
-
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    
     Matrix world;
     world.perspective(90, 1, 0.2f, 10);
-    //world.orthographic(4, -4, -4, 4, 0.2, 10);
+    //world.orthographic(1.5, -1.5, -1.5, 1.5, 0.2, 10);
     perMod = &world;
     uniformWorld = glGetUniformLocation(prog.programID, "world");
     glUniformMatrix4fv(uniformWorld, 1, GL_FALSE, world.matrix);
@@ -57,18 +61,20 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
     BasicQuad one(2, 2, prog.programID);
     quad = &one;
     one.model.translate(0, 0, -5);
+    one.texture.load("type.bmp");
 
     BasicQuad two(2, 2, prog.programID);
     du = &two;
-    two.texture.load("col.bmp");
     two.model.translate(0, 0, -1);
 
+    srand(time(NULL));
+    unsigned short mapw = 4;
     uint16_t map[16] = { 0};
     for(char i = 0; i < 16; i++) {
-        map[i] = i;
+        map[i] = rand() % 16;
     }
-    unsigned short mapw = 4;
-    two.texture.tile(4, map, mapw, mapw);
+    BMP tileset("col.bmp");
+    two.texture.tile(16, map, mapw, mapw, &tileset);
 
     MSG msg = { 0 };
 
@@ -79,12 +85,19 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
         render();
         if(one.position.z >= -1.5f) {
             oneMove.z = -0.1f;
+            for(char i = 0; i < 16; i++) {
+                map[i] = rand() % 16;
+            }
+            two.texture.tile(16, map, mapw, mapw, &tileset);
         }
         else if(one.position.z <= -6.f) {
             oneMove.z = 0.1f;
+            for(char i = 0; i < 16; i++) {
+                map[i] = rand() % 16;
+            }
+            two.texture.tile(16, map, mapw, mapw, &tileset);
         }
         one.Translate(oneMove);
-
         Sleep(16);
         while(PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
             if(msg.message == WM_QUIT) {

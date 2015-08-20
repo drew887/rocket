@@ -27,8 +27,6 @@ BasicQuad::BasicQuad(float width, float height, int programID) {
     int current = 0;
     glGetIntegerv(GL_VERTEX_ARRAY_BINDING, &current);
     glBindVertexArray(vertexArrayID);
-    
-    texture.load("type.bmp");
 
     glBindBuffer(GL_ARRAY_BUFFER, vertexBufferID);
     glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 8, verticies, GL_STATIC_DRAW);
@@ -59,7 +57,6 @@ void BasicQuad::Render() {
     glGetIntegerv(GL_VERTEX_ARRAY_BINDING, &current);
 
     glBindVertexArray(vertexArrayID);
-    //model = trans *  rot * scale;
     glUniformMatrix4fv(modelLoc, 1, GL_FALSE, model.matrix);
     
     glActiveTexture(GL_TEXTURE0);

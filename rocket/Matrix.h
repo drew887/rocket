@@ -16,6 +16,7 @@ namespace anGL {
         Matrix& operator*=(const Matrix& other);
         float& operator[](unsigned int offset);
         
+        void setIdentity(float identity);
         void perspective(float fieldOfView, float aspect, float nearPlane, float farPlane);
         void frustum(float top, float bottom, float left, float right, float nearPlane, float farPlane);
         void orthographic(float top, float bottom, float left, float right, float nearPlane, float farPlane);
