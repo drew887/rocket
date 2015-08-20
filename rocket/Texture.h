@@ -19,6 +19,7 @@ namespace anGL {
         bool load(string location);
         //! Returns a new anGL::BMP with a copy of the data between the rectagle defined by startX, startY, width, and height
         BMP subImage(uint32_t startX, uint32_t startY, uint32_t width, uint32_t height);
+        //! Dumps the subImage data into destination
         bool subImage(uint32_t * destination, uint32_t startX, uint32_t startY, uint32_t width, uint32_t height);
         BMP& operator=(BMP& other);
 
@@ -42,6 +43,7 @@ namespace anGL {
         void setFilter(GLenum min, GLenum mag);
         //! Sets the wrap functions in the S and T directions for the texture
         void setWrap(GLenum wrap_S, GLenum wrap_T);
+        //! Used to create a tiled texture reading from source or if source is null from image
         void tile(uint8_t tileSize, uint16_t * tiles, uint16_t width, uint16_t height, BMP * source = NULL);
 
         bool loaded;

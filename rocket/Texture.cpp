@@ -81,7 +81,15 @@ void Texture::setWrap(GLenum wrap_S, GLenum wrap_T) {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrap_T);
 }
 
-
+/*!
+    \param tileSize the tile of the tile in both width and height
+    \param tiles the array of tile indexes
+    \param width how many tiles there are in the x direction
+    \param height same as width but in the y direction
+    \param source a BMP to pull tiles out of or image if source is set to NULL
+    \warning width and height are both for how many tiles there are in each direction, not the indended size of the resulted
+    image which is calucalated by (width * tileSize) * (height * tileSize)
+*/
 void Texture::tile(uint8_t tileSize, uint16_t * tiles, uint16_t width, uint16_t height, BMP * source) {
     if(source == NULL) {
         source = &image;
@@ -224,7 +232,11 @@ BMP BMP::subImage(uint32_t startX, uint32_t startY, uint32_t subWidth, uint32_t 
     return result;
 }
 
-
+/*!
+    \param destination an array of uint32_t's that will be filled with the image data
+    works the same as the other overload but instead of returning a new BMP containing the subImage it puts
+    it all into destination. Usefull (and is used) for pulling out a tile.
+*/
 bool BMP::subImage(uint32_t * destination, uint32_t startX, uint32_t startY, uint32_t subWidth, uint32_t subHeight) {
     bool result = false;
     assert(loaded);
