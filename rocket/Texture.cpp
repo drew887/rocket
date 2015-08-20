@@ -36,7 +36,7 @@ Texture::Texture(string location) {
     load(location);
 }
 
-Texture::Texture(){
+Texture::Texture() {
     glGenTextures(1, &texID);
     loaded = false;
 }
@@ -60,7 +60,7 @@ bool Texture::load(string location) {
     return result;
 }
 
-void Texture::setImage(BMP& img){
+void Texture::setImage(BMP& img) {
     assert(img.loaded);
     if(img.loaded) {
         image = img;
@@ -71,14 +71,46 @@ void Texture::setImage(BMP& img){
     }
 }
 
-void Texture::setFilter(GLenum min, GLenum mag){
+void Texture::setFilter(GLenum min, GLenum mag) {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, min);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, mag);
 }
 
-void Texture::setWrap(GLenum wrap_S, GLenum wrap_T){
+void Texture::setWrap(GLenum wrap_S, GLenum wrap_T) {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrap_S);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrap_T);
+}
+
+
+void Texture::tile(uint8_t tileSize, uint16_t * tiles, uint16_t width, uint16_t height, BMP * source) {
+    if(source == NULL) {
+        source = &image;
+    }
+    BMP result;
+    result.height = height * tileSize;
+    result.width = width * tileSize;
+    result.size = result.width * result.height;
+    result.image = new uint32_t[result.size];
+    uint32_t * tile = new uint32_t[tileSize * tileSize];
+    source->subImage(tile, 0, 0, tileSize, tileSize);
+    uint32_t current, xPlace, yPlace, tileX, tileY, tileNo = 0;
+    for(uint16_t currentTile = 0; currentTile < height * width; currentTile++) {
+        current = 0;
+        xPlace = tileSize * (currentTile % width);
+        yPlace = currentTile / width*tileSize;
+        tileX = tileSize * (tiles[currentTile] % (source->width / tileSize));
+        tileY = (tiles[currentTile] * tileSize / source->height) * tileSize;
+        source->subImage(tile, tileX, tileY, tileSize, tileSize);
+        uint32_t stride = tileSize*width;
+        for(uint32_t yStride = yPlace; yStride < yPlace + tileSize; yStride++) {
+            for(uint32_t xStride = xPlace; xStride < xPlace + tileSize; xStride++) {
+                result.image[xStride + (yStride*stride)] = tile[current++];
+            }
+        }
+    }
+    delete[] tile;
+    result.loaded = true;
+    setImage(result);
 }
 
 BMP::BMP() {
@@ -87,7 +119,7 @@ BMP::BMP() {
     width = height = size = 0;
 }
 
-BMP::BMP(BMP & other){
+BMP::BMP(BMP & other) {
     if(other.loaded) {
         width = other.width;
         height = other.height;
@@ -104,6 +136,17 @@ BMP::BMP(BMP & other){
         image = NULL;
         width = height = size = 0;
     }
+}
+
+BMP::BMP(BMP && other) {
+    width = other.width;
+    height = other.height;
+    size = width * height;
+    image = other.image;
+    loaded = other.loaded;
+    other.image = NULL;
+    other.width = other.height = other.size = 0;
+    other.loaded = false;
 }
 
 BMP::BMP(string location) {
@@ -147,6 +190,7 @@ bool BMP::load(string location) {
     return result;
 }
 
+
 /*!
     \param startX starting point in the X direction of this image
     \param startY starting point in the Y direction of this image
@@ -157,7 +201,7 @@ bool BMP::load(string location) {
     same thing for the height or if subWidth * subHeight is larger than the image's size
 */
 
-BMP BMP::subImage(uint32_t startX, uint32_t startY, uint32_t subWidth, uint32_t subHeight){
+BMP BMP::subImage(uint32_t startX, uint32_t startY, uint32_t subWidth, uint32_t subHeight) {
     BMP result;
     assert(loaded);
     assert((subWidth * subHeight <= size));
@@ -168,11 +212,11 @@ BMP BMP::subImage(uint32_t startX, uint32_t startY, uint32_t subWidth, uint32_t 
         result.height = subHeight;
         result.size = subWidth * subHeight;
         result.image = new uint32_t[result.size];
-        uint32_t * start = &image[startX+(startY*width)];
+        uint32_t * start = &image[startX + (startY*width)];
         uint32_t stride = width - subWidth;
         for(uint32_t yStride = 0; yStride < subHeight; yStride++) {
             for(uint32_t xStride = 0; xStride < subWidth; xStride++) {
-                result.image[xStride + (yStride*subWidth)] = start[xStride + (yStride*stride)+(yStride*subWidth)];
+                result.image[xStride + (yStride*subWidth)] = start[xStride + (yStride*stride) + (yStride*subWidth)];
             }
         }
         result.loaded = true;
@@ -180,10 +224,31 @@ BMP BMP::subImage(uint32_t startX, uint32_t startY, uint32_t subWidth, uint32_t 
     return result;
 }
 
+
+bool BMP::subImage(uint32_t * destination, uint32_t startX, uint32_t startY, uint32_t subWidth, uint32_t subHeight) {
+    bool result = false;
+    assert(loaded);
+    assert((subWidth * subHeight <= size));
+    assert(startX + subWidth <= width);
+    assert(startY + subHeight <= height);
+    if(loaded && (subWidth * subHeight <= size)) {
+        uint32_t size = subWidth * subHeight;
+        uint32_t * start = &image[startX + (startY*width)];
+        uint32_t stride = width - subWidth;
+        for(uint32_t yStride = 0; yStride < subHeight; yStride++) {
+            for(uint32_t xStride = 0; xStride < subWidth; xStride++) {
+                destination[xStride + (yStride*subWidth)] = start[xStride + (yStride*stride) + (yStride*subWidth)];
+            }
+        }
+        result = true;
+    }
+    return result;
+}
+
 /*!
     if other.loaded is true does a full copy, otherwise free's image and sets everything to 0
 */
-BMP & BMP::operator=(BMP& other){
+BMP & BMP::operator=(BMP& other) {
     if(other.loaded) {
         width = other.width;
         height = other.height;
@@ -195,10 +260,11 @@ BMP & BMP::operator=(BMP& other){
                 image[y + (x*width)] = other.image[y + (x*width)];
             }
         }
-    } else {
+    }
+    else {
         delete[] image;
         image = NULL;
-        width = height = size = 0; 
+        width = height = size = 0;
     }
     return *this;
 }

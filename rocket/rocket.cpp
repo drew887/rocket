@@ -15,17 +15,24 @@ using namespace anGL;
 
 HDC device;
 
-unsigned int vao, vbo, colorVBO;
 int uniformWorld;
 
-BasicQuad * quad, * du;
-Matrix * triMod, * perMod = NULL;
+BasicQuad * quad, *du;
+Matrix * perMod = NULL;
 
 int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd) {
 #define winh 600
 #define winw 600
-    HWND windowHandle = createOpenGLWin(hInstance, L"WindowTest", winw, winh, WndProc);
-    if(windowHandle == 0) { 
+
+    int attribs[] = {
+        WGL_CONTEXT_MAJOR_VERSION_ARB, 3,
+        WGL_CONTEXT_MINOR_VERSION_ARB, 3,
+        WGL_CONTEXT_FLAGS_ARB, 0,
+        0
+    };
+
+    HWND windowHandle = createOpenGLWin(hInstance, L"WindowTest", winw, winh, attribs, WndProc);
+    if(windowHandle == 0) {
         return 1;
     }
     device = GetDC(windowHandle);
@@ -46,40 +53,38 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
     perMod = &world;
     uniformWorld = glGetUniformLocation(prog.programID, "world");
     glUniformMatrix4fv(uniformWorld, 1, GL_FALSE, world.matrix);
-    
+
     BasicQuad one(2, 2, prog.programID);
     quad = &one;
-    //one.model.scale(0.1f, 0.1f, 0);
     one.model.translate(0, 0, -5);
 
-    BasicQuad two(1, 2, prog.programID);
+    BasicQuad two(2, 2, prog.programID);
     du = &two;
     two.texture.load("col.bmp");
     two.model.translate(0, 0, -1);
 
-    BMP col("col.bmp");
-    BMP test = col.subImage(0, 0, 8, 16);
-    two.texture.setImage(test);
+    uint16_t map[16] = { 0};
+    for(char i = 0; i < 16; i++) {
+        map[i] = i;
+    }
+    unsigned short mapw = 4;
+    two.texture.tile(4, map, mapw, mapw);
 
     MSG msg = { 0 };
 
-    bool forward = true;
-    glClearColor(0.8f, 0.8f, 0.8f, 1.0f);
+    glClearColor(0.0f, 0.8f, 0.8f, 1.0f);
     bool loop = true;
     Vector oneMove(0, 0, 0.1f);
     while(loop) {
         render();
         if(one.position.z >= -1.5f) {
             oneMove.z = -0.1f;
-            //two.texture.setImage(test);
         }
         else if(one.position.z <= -6.f) {
             oneMove.z = 0.1f;
-            //two.texture.setImage(col);
         }
         one.Translate(oneMove);
 
-        //two.Rotate(3, 0, 0, 1);
         Sleep(16);
         while(PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
             if(msg.message == WM_QUIT) {
@@ -98,13 +103,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         PostQuitMessage(0);
         break;
     case WM_DESTROY: {
-        glDeleteVertexArrays(1, &vao);
-        glDeleteBuffers(1, &vbo);
         HGLRC context = wglGetCurrentContext();
         wglMakeCurrent(NULL, NULL);
         wglDeleteContext(context);
     }
-        break;
+                     break;
     case WM_SIZE:
         glViewport(0, 0, LOWORD(lParam), HIWORD(lParam));
         if(perMod) {

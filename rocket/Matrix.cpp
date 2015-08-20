@@ -78,7 +78,7 @@ float& Matrix::operator[](unsigned int offset) {
 }
 
 #include <math.h>
-#define PI 3.14159265
+#define PI 3.14159265f
 float anGL::degtorad(float deg) {
     return deg * (PI / 180);
 }
@@ -96,7 +96,7 @@ float anGL::radtodeg(float rad) {
     \param far where to stick the far clipping plane
 */
 void Matrix::perspective(float fieldOfView, float aspect, float near, float far) {
-    float tanOfView = tanf(fieldOfView / 2.0);
+    float tanOfView = tanf(fieldOfView / 2.0f);
     matrix[0] = 1 / (aspect * tanOfView);
     matrix[5] = 1 / (tanOfView);
     matrix[10] = -(far + near) / (far - near);
@@ -142,7 +142,7 @@ void Matrix::orthographic(float top, float bottom, float left, float right, floa
  // Transformation funcs  //
 ////                   ////
 
-void anGL::Matrix::setScale(float x, float y, float z) {
+void Matrix::setScale(float x, float y, float z) {
     matrix[0] = x;
     matrix[5] = y;
     matrix[10] = z;
@@ -156,7 +156,7 @@ void Matrix::scale(float x, float y, float z) {
     *this = temp * *this;
 }
 
-void anGL::Matrix::setTranslation(float x, float y, float z) {
+void Matrix::setTranslation(float x, float y, float z) {
     matrix[12] = x;
     matrix[13] = y;
     matrix[14] = z;
@@ -192,7 +192,7 @@ void Matrix::rotate(float rot, float rx, float ry, float rz) {
     *this = result * *this;
 }
 
-void anGL::Matrix::setRotation(float rot, float rx, float ry, float rz){
+void Matrix::setRotation(float rot, float rx, float ry, float rz){
     float s, c, t;//sin cos and 1-cos constants
     float rad = degtorad(rot);
     s = sinf(rad);

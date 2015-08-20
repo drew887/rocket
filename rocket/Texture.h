@@ -14,10 +14,12 @@ namespace anGL {
         BMP();
         BMP(string location);
         BMP(BMP& other);
+        BMP(BMP&& other);
         //!Loads a bmp at location into image
         bool load(string location);
         //! Returns a new anGL::BMP with a copy of the data between the rectagle defined by startX, startY, width, and height
         BMP subImage(uint32_t startX, uint32_t startY, uint32_t width, uint32_t height);
+        bool subImage(uint32_t * destination, uint32_t startX, uint32_t startY, uint32_t width, uint32_t height);
         BMP& operator=(BMP& other);
 
         uint32_t width, height, size;
@@ -28,7 +30,6 @@ namespace anGL {
 
     //! Represents an openGL texture and holds an anGL::BMP for image data
     class Texture {
-    protected:
     public:
         Texture(string location);
         Texture();
@@ -41,7 +42,7 @@ namespace anGL {
         void setFilter(GLenum min, GLenum mag);
         //! Sets the wrap functions in the S and T directions for the texture
         void setWrap(GLenum wrap_S, GLenum wrap_T);
-        //void tile(uint8_t * tiles, uint32_t width, uint32_t height);
+        void tile(uint8_t tileSize, uint16_t * tiles, uint16_t width, uint16_t height, BMP * source = NULL);
 
         bool loaded;
         BMP image;

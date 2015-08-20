@@ -9,7 +9,7 @@ Vector::Vector(float X, float Y, float Z, float W): x(points[0]), y(points[1]), 
     w = W;
 }
 
-anGL::Vector::Vector(const Vector & other) : x(points[0]), y(points[1]), z(points[2]), w(points[3]) {
+Vector::Vector(const Vector & other) : x(points[0]), y(points[1]), z(points[2]), w(points[3]) {
     x = other.x;
     y = other.y;
     z = other.z;
@@ -43,7 +43,7 @@ Vector& Vector::operator+=(const Vector & other) {
     return *this;
 }
 
-Vector anGL::Vector::operator-(const Vector & other) {
+Vector Vector::operator-(const Vector & other) {
     Vector result;
     result.x = (x - other.x);
     result.y = (y - other.y);
@@ -52,12 +52,12 @@ Vector anGL::Vector::operator-(const Vector & other) {
     return result;
 }
 
-Vector& anGL::Vector::operator-=(const Vector & other) {
+Vector& Vector::operator-=(const Vector & other) {
     *this = *this - other;
     return *this;
 }
 
-Vector anGL::Vector::operator*(const Vector & other) {
+Vector Vector::operator*(const Vector & other) {
     Vector result;
     result.x = (x * other.x);
     result.y = (y * other.y);
@@ -66,12 +66,12 @@ Vector anGL::Vector::operator*(const Vector & other) {
     return result;
 }
 
-Vector& anGL::Vector::operator*=(const Vector & other) {
+Vector& Vector::operator*=(const Vector & other) {
     *this = *this * other;
     return *this;
 }
 
-Vector anGL::Vector::operator/(const Vector & other) {
+Vector Vector::operator/(const Vector & other) {
     Vector result;
     result.x = (x / other.x);
     result.y = (y / other.y);
@@ -80,7 +80,7 @@ Vector anGL::Vector::operator/(const Vector & other) {
     return result;
 }
 
-Vector& anGL::Vector::operator/=(const Vector & other) {
+Vector& Vector::operator/=(const Vector & other) {
     *this = *this / other;
     return *this;
 }
@@ -101,7 +101,7 @@ Vector& Vector::operator+=(float rhs) {
     return *this;
 }
 
-Vector anGL::Vector::operator-(float rhs) {
+Vector Vector::operator-(float rhs) {
     Vector result;
     result.x = (x - rhs);
     result.y = (y - rhs);
@@ -110,12 +110,12 @@ Vector anGL::Vector::operator-(float rhs) {
     return result;
 }
 
-Vector& anGL::Vector::operator-=(float rhs) {
+Vector& Vector::operator-=(float rhs) {
     *this = *this - rhs;
     return *this;
 }
 
-Vector anGL::Vector::operator*(float rhs) {
+Vector Vector::operator*(float rhs) {
     Vector result;
     result.x = (x * rhs);
     result.y = (y * rhs);
@@ -124,12 +124,12 @@ Vector anGL::Vector::operator*(float rhs) {
     return result;
 }
 
-Vector& anGL::Vector::operator*=(float rhs) {
+Vector& Vector::operator*=(float rhs) {
     *this = *this * rhs;
     return *this;
 }
 
-Vector anGL::Vector::operator/(float rhs) {
+Vector Vector::operator/(float rhs) {
     Vector result;
     result.x = (x / rhs);
     result.y = (y / rhs);
@@ -138,25 +138,25 @@ Vector anGL::Vector::operator/(float rhs) {
     return result;
 }
 
-Vector& anGL::Vector::operator/=(float rhs) {
+Vector& Vector::operator/=(float rhs) {
     *this = *this / rhs;
     return *this;
 }
 
 ////
-float anGL::Vector::dot(const Vector other) const {
+float Vector::dot(const Vector other) const {
     float result = 0;
     result = (x*other.x) + (y*other.y) + (z*other.z);
     return result;
 }
 
-float anGL::Vector::dot4(const Vector other) const {
+float Vector::dot4(const Vector other) const {
     float result = 0;
     result = (x*other.x) + (y*other.y) + (z*other.z) +(w*other.w);
     return result;
 }
 
-Vector anGL::Vector::cross(const Vector other) const {
+Vector Vector::cross(const Vector other) const {
     Vector result(0, 0, 0, 0);
     result.points[0] = (y*other.z) - (z*other.y);
     result.points[1] = (z*other.x) - (x*other.z);

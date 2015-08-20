@@ -2,7 +2,8 @@
 
 using namespace anGL;
 
-HWND anGL::createOpenGLWin(HINSTANCE hInstance, const wchar_t * windowName, int width, int height, LRESULT(CALLBACK *windowCallback)(HWND, UINT, WPARAM, LPARAM)) {
+HWND anGL::createOpenGLWin(HINSTANCE hInstance, const wchar_t * windowName, int width, int height, const int * attribs,LRESULT(CALLBACK *windowCallback)(HWND, UINT, WPARAM, LPARAM)) {
+    
     WNDCLASS windowClass = { 0 };
     windowClass.hInstance = hInstance;
     windowClass.lpszClassName = windowName;
@@ -65,16 +66,9 @@ HWND anGL::createOpenGLWin(HINSTANCE hInstance, const wchar_t * windowName, int 
         return 0;
     }
 
-    int ourGLAttributes[] =
-    {
-        WGL_CONTEXT_MAJOR_VERSION_ARB, 3,
-        WGL_CONTEXT_MINOR_VERSION_ARB, 3,
-        WGL_CONTEXT_FLAGS_ARB, 0,
-        0
-    };
     wglMakeCurrent(NULL, NULL);
     wglDeleteContext(openGLContext);
-    openGLContext = wglCreateContextAttribsARB(windowDC, 0, ourGLAttributes);
+    openGLContext = wglCreateContextAttribsARB(windowDC, 0, attribs);
     wglMakeCurrent(windowDC, openGLContext);
 
     return windowHandle;
