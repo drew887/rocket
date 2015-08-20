@@ -9,7 +9,7 @@
 
 namespace anGL {
 
-    HWND createOpenGLWin(HINSTANCE hInstance, const wchar_t * windowName, int width, int height, LRESULT(CALLBACK *windowCallback)(HWND, UINT, WPARAM, LPARAM));
+    HWND createOpenGLWin(HINSTANCE hInstance, const wchar_t * windowName, int width, int height, const int * attribs,LRESULT(CALLBACK *windowCallback)(HWND, UINT, WPARAM, LPARAM));
 }
 
 #endif

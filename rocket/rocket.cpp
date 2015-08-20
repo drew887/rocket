@@ -15,16 +15,23 @@ using namespace anGL;
 
 HDC device;
 
-unsigned int vao, vbo, colorVBO;
 int uniformWorld;
 
 BasicQuad * quad, *du;
-Matrix * triMod, *perMod = NULL;
+Matrix * perMod = NULL;
 
 int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd) {
 #define winh 600
 #define winw 600
-    HWND windowHandle = createOpenGLWin(hInstance, L"WindowTest", winw, winh, WndProc);
+
+    int attribs[] = {
+        WGL_CONTEXT_MAJOR_VERSION_ARB, 3,
+        WGL_CONTEXT_MINOR_VERSION_ARB, 3,
+        WGL_CONTEXT_FLAGS_ARB, 0,
+        0
+    };
+
+    HWND windowHandle = createOpenGLWin(hInstance, L"WindowTest", winw, winh, attribs, WndProc);
     if(windowHandle == 0) {
         return 1;
     }
@@ -56,13 +63,15 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
     two.texture.load("col.bmp");
     two.model.translate(0, 0, -1);
 
-    uint16_t map[4] = { 1, 2, 0, 3 };
-    unsigned short mapw = 2;
-    two.texture.tile(map, mapw, mapw);
+    uint16_t map[16] = { 0};
+    for(char i = 0; i < 16; i++) {
+        map[i] = i;
+    }
+    unsigned short mapw = 4;
+    two.texture.tile(4, map, mapw, mapw);
 
     MSG msg = { 0 };
 
-    bool forward = true;
     glClearColor(0.0f, 0.8f, 0.8f, 1.0f);
     bool loop = true;
     Vector oneMove(0, 0, 0.1f);
@@ -76,7 +85,6 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
         }
         one.Translate(oneMove);
 
-        //two.Rotate(3, 0, 0, 1);
         Sleep(16);
         while(PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
             if(msg.message == WM_QUIT) {
@@ -95,8 +103,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         PostQuitMessage(0);
         break;
     case WM_DESTROY: {
-        glDeleteVertexArrays(1, &vao);
-        glDeleteBuffers(1, &vbo);
         HGLRC context = wglGetCurrentContext();
         wglMakeCurrent(NULL, NULL);
         wglDeleteContext(context);

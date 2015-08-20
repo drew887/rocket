@@ -80,11 +80,10 @@ void Texture::setWrap(GLenum wrap_S, GLenum wrap_T) {
 }
 
 
-void Texture::tile(uint16_t * tiles, uint16_t width, uint16_t height, BMP * source) {
+void Texture::tile(uint8_t tileSize, uint16_t * tiles, uint16_t width, uint16_t height, BMP * source) {
     if(source == NULL) {
         source = &image;
     }
-#define tileSize 8
     BMP result;
     result.height = height * tileSize;
     result.width = width * tileSize;
@@ -97,12 +96,12 @@ void Texture::tile(uint16_t * tiles, uint16_t width, uint16_t height, BMP * sour
         current = 0;
         xPlace = tileSize * (currentTile % width);
         yPlace = currentTile / width*tileSize;
-        tileX = tileSize * (tiles[currentTile] % width);;
-        tileY = tiles[currentTile] / width* tileSize;
+        tileX = tileSize * (tiles[currentTile] % (source->width / tileSize));
+        tileY = (tiles[currentTile] * tileSize / source->height) * tileSize;
         source->subImage(tile, tileX, tileY, tileSize, tileSize);
         uint32_t stride = tileSize*width;
-        for(uint32_t yStride = yPlace; yStride < yPlace+tileSize; yStride++) {
-            for(uint32_t xStride = xPlace; xStride < xPlace+tileSize; xStride++) {
+        for(uint32_t yStride = yPlace; yStride < yPlace + tileSize; yStride++) {
+            for(uint32_t xStride = xPlace; xStride < xPlace + tileSize; xStride++) {
                 result.image[xStride + (yStride*stride)] = tile[current++];
             }
         }

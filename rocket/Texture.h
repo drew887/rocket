@@ -33,7 +33,7 @@ namespace anGL {
         void setImage(BMP& img);
         void setFilter(GLenum min, GLenum mag);
         void setWrap(GLenum wrap_S, GLenum wrap_T);
-        void tile(uint16_t * tiles, uint16_t width, uint16_t height, BMP * source = NULL);
+        void tile(uint8_t tileSize, uint16_t * tiles, uint16_t width, uint16_t height, BMP * source = NULL);
 
         bool loaded;
         BMP image;
