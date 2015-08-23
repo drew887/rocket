@@ -1,4 +1,5 @@
 #include "Vector.h"
+#include <math.h>
 
 using namespace anGL;
 
@@ -151,7 +152,7 @@ float Vector::dot(const Vector other) const {
 }
 
 float Vector::dot4(const Vector other) const {
-    float result = 0;
+    float result;
     result = (x*other.x) + (y*other.y) + (z*other.z) +(w*other.w);
     return result;
 }
@@ -162,6 +163,18 @@ Vector Vector::cross(const Vector other) const {
     result.points[1] = (z*other.x) - (x*other.z);
     result.points[2] = (x*other.y) - (y*other.x);
     return result;
+}
+
+void Vector::normalize(){
+    float mag = magnitude();
+    x /= mag;
+    y /= mag;
+    z /= mag;
+    w /= mag;
+}
+
+float Vector::magnitude() {
+    return sqrtf((x*x) + (y*y) + (z*z) + (w*w));
 }
 
 float anGL::dot(const Vector one, const Vector two, bool dot4) {

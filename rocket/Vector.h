@@ -34,6 +34,8 @@ namespace anGL {
         float dot(const Vector other) const; //dot product as if a 3 point vector
         float dot4(const Vector other) const; //full 4 point dot product
         Vector cross(const Vector other) const;
+        void normalize();
+        float magnitude();
 
         float points[4];
         float &x, &y, &z, &w;
