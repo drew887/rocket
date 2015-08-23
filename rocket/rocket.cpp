@@ -71,11 +71,13 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
     unsigned short mapw = 4;
     uint16_t map[16] = { 0 };
     for(char i = 0; i < 16; i++) {
-        map[i] = rand() % 16;
+        //map[i] = rand() % 16;
+        map[i] = i;
     }
     BMP tileset("col.bmp");
     two.texture.tile(16, map, mapw, mapw, &tileset);
-
+    map[0] = map[1] = map[2] = map[3] = 15;
+    two.texture.subTile(16, map, 16, 16, 2, 2, &tileset);
     MSG msg = { 0 };
 
     glClearColor(0.0f, 0.8f, 0.8f, 1.0f);
@@ -92,13 +94,13 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
         }
         else if(one.position.z <= -6.f) {
             oneMove.z = 0.1f;
-            for(char i = 0; i < 16; i++) {
-                map[i] = rand() % 16;
+            for(char i = 0; i < 4; i++) {
+                map[i] = 15;
             }
-            two.texture.tile(16, map, mapw, mapw, &tileset);
+            two.texture.subTile(16, map, 16, 16, 2, 2, &tileset);
         }
         one.Translate(oneMove);
-        two.Rotate(1, 0, 0, 1);
+        //two.Rotate(1, 0, 0, 1);
         Sleep(16);
         while(PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
             if(msg.message == WM_QUIT) {

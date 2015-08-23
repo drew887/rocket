@@ -47,8 +47,7 @@ Texture::~Texture() {
 bool Texture::load(string location) {
     bool result = false;
     if(image.load(location)) {
-        glBindTexture(GL_TEXTURE_2D, texID);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, image.width, image.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image.image);
+        updateTexture();
         setFilter(GL_NEAREST, GL_NEAREST);
         setWrap(GL_CLAMP_TO_BORDER, GL_CLAMP_TO_BORDER);
         //glGenerateMipmap(GL_TEXTURE_2D);
@@ -66,15 +65,25 @@ void Texture::setImage(BMP& img) {
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, image.width, image.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image.image);
         setFilter(GL_NEAREST, GL_NEAREST);
         setWrap(GL_CLAMP_TO_BORDER, GL_CLAMP_TO_BORDER);
+        loaded = true;
+    }
+}
+
+void Texture::updateTexture(){
+    if(image.loaded) {
+        glBindTexture(GL_TEXTURE_2D, texID);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, image.width, image.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image.image);
     }
 }
 
 void Texture::setFilter(GLenum min, GLenum mag) {
+    glBindTexture(GL_TEXTURE_2D, texID);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, min);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, mag);
 }
 
 void Texture::setWrap(GLenum wrap_S, GLenum wrap_T) {
+    glBindTexture(GL_TEXTURE_2D, texID);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrap_S);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrap_T);
 }
@@ -82,6 +91,7 @@ void Texture::setWrap(GLenum wrap_S, GLenum wrap_T) {
 
 void Texture::tile(uint8_t tileSize, uint16_t * tiles, uint16_t width, uint16_t height, BMP * source) {
     if(source == NULL) {
+        assert(loaded);
         source = &image;
     }
     BMP result;
@@ -90,7 +100,6 @@ void Texture::tile(uint8_t tileSize, uint16_t * tiles, uint16_t width, uint16_t 
     result.size = result.width * result.height;
     result.image = new uint32_t[result.size];
     uint32_t * tile = new uint32_t[tileSize * tileSize];
-    source->subImage(tile, 0, 0, tileSize, tileSize);
     uint32_t current, xPlace, yPlace, tileX, tileY, tileNo = 0, numTiles = source->size / (tileSize*tileSize);
     for(uint16_t currentTile = 0; currentTile < height * width; currentTile++) {
         assert(tiles[currentTile] < numTiles);
@@ -110,6 +119,36 @@ void Texture::tile(uint8_t tileSize, uint16_t * tiles, uint16_t width, uint16_t 
     delete[] tile;
     result.loaded = true;
     setImage(result);
+}
+
+void Texture::subTile(uint8_t tileSize, uint16_t * tiles, uint16_t xOffset, uint16_t yOffset, uint16_t width, uint16_t height, BMP * source){
+    if(loaded) {
+        if(source == NULL) {
+            source = &image;
+        }
+        uint32_t * tile = new uint32_t[tileSize * tileSize];
+        uint32_t current, xPlace, yPlace, tileX, tileY, tileNo = 0, numTiles = source->size / (tileSize*tileSize);
+        for(uint16_t currentTile = 0; currentTile < height * width; currentTile++) {
+            assert(tiles[currentTile] < numTiles);
+            current = 0;
+            xPlace = tileSize * (currentTile % width);
+            yPlace = currentTile / width*tileSize;
+            tileX = tileSize * (tiles[currentTile] % (source->width / tileSize));
+            tileY = (tiles[currentTile] * tileSize / source->height) * tileSize;
+            source->subImage(tile, tileX, tileY, tileSize, tileSize);
+            uint32_t stride = tileSize*width;
+            for(uint32_t yStride = yPlace; yStride < yPlace + tileSize; yStride++) {
+                for(uint32_t xStride = xPlace; xStride < xPlace + tileSize; xStride++) {
+                    image.image[xStride + (yStride*stride)] = tile[current++];
+                }
+            }
+        }
+        delete[] tile;
+        glBindTexture(GL_TEXTURE_2D, texID);
+        glTexSubImage2D(GL_TEXTURE_2D, 0, xOffset, yOffset, width*tileSize, height*tileSize, GL_RGBA, GL_UNSIGNED_BYTE, image.image);
+        setFilter(GL_NEAREST, GL_NEAREST);
+        setWrap(GL_CLAMP_TO_BORDER, GL_CLAMP_TO_BORDER);
+    }
 }
 
 BMP::BMP() {
@@ -248,16 +287,17 @@ BMP & BMP::operator=(BMP& other) {
         size = width * height;
         delete[] image;
         image = new uint32_t[size];
+        loaded = true;
         for(uint32_t x = 0; x < height; x++) {
             for(uint32_t y = 0; y < width; y++) {
                 image[y + (x*width)] = other.image[y + (x*width)];
             }
         }
-    }
-    else {
+    } else {
         delete[] image;
         image = NULL;
         width = height = size = 0;
+        loaded = false;
     }
     return *this;
 }
