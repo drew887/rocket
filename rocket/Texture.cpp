@@ -62,7 +62,7 @@ void Texture::setImage(BMP& img) {
     if(img.loaded) {
         image = img;
         glBindTexture(GL_TEXTURE_2D, texID);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, image.width, image.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image.image);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, image.width, image.height, 0, GL_BGRA, GL_UNSIGNED_BYTE, image.image);
         setFilter(GL_NEAREST, GL_NEAREST);
         setWrap(GL_CLAMP_TO_BORDER, GL_CLAMP_TO_BORDER);
         loaded = true;
@@ -72,7 +72,7 @@ void Texture::setImage(BMP& img) {
 void Texture::updateTexture(){
     if(image.loaded) {
         glBindTexture(GL_TEXTURE_2D, texID);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, image.width, image.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image.image);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, image.width, image.height, 0, GL_BGRA, GL_UNSIGNED_BYTE, image.image);
     }
 }
 
@@ -216,9 +216,9 @@ bool BMP::load(string location) {
         int invert = 0;
         for(uint32_t i = 0; i < height; i++) {
             for(uint32_t z = 0; z < width; z++) {
-                fread(&r, 1, 1, fp);
-                fread(&g, 1, 1, fp);
                 fread(&b, 1, 1, fp);
+                fread(&g, 1, 1, fp);
+                fread(&r, 1, 1, fp);
                 if((r << 16 | g << 8 | b) == alphaMask) {
                     A = 0;
                 }

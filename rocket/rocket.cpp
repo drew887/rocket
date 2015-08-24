@@ -21,6 +21,7 @@ int uniformWorld;
 
 BasicQuad * quad, *du;
 Matrix * perMod = NULL;
+bool keys[256] = { 0 };
 
 int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd) {
 #define winh 600
@@ -53,54 +54,54 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
 
     Matrix world;
     //world.perspective(90, 1, 0.2f, 10);
-    world.orthographic(1.5, -1.5, -1.5, 1.5, 0.2, 10);
+#define squareS 3.f
+    world.orthographic(squareS, -squareS, -squareS, squareS, 0.2f, 10);
     perMod = &world;
     uniformWorld = glGetUniformLocation(prog.programID, "world");
     glUniformMatrix4fv(uniformWorld, 1, GL_FALSE, world.matrix);
 
-    BasicQuad one(2, 2, prog.programID);
+    BasicQuad one(1, 1);
     quad = &one;
-    one.model.translate(0, 0, -5);
-    one.texture.load("type.bmp");
+    one.Translate(0, 0, -3);
+    one.texture.image.alphaMask = 0xFFFFFF;
+    one.texture.load("vtr.bmp");
+    one.setLocs(prog.programID);
 
-    BasicQuad two(2, 2, prog.programID);
+    BasicQuad two(4, 4);
     du = &two;
-    two.model.translate(0, 0, -1);
+    two.Translate(0, 0, -3.001f);
+    two.setLocs(prog.programID);
 
     srand((int)time(NULL));
     unsigned short mapw = 4;
-    uint16_t map[16] = { 0 };
-    for(char i = 0; i < 16; i++) {
-        //map[i] = rand() % 16;
-        map[i] = i;
-    }
-    BMP tileset("col.bmp");
+    uint16_t map[16] = { 
+        0, 1, 1, 2,
+        3, 4, 4, 5,
+        3, 4, 4, 5,
+        6, 7, 7, 8 
+    };
+    BMP tileset("ship.bmp");
     two.texture.tile(16, map, mapw, mapw, &tileset);
-    map[0] = map[1] = map[2] = map[3] = 15;
-    two.texture.subTile(16, map, 16, 16, 2, 2, &tileset);
+    
     MSG msg = { 0 };
 
     glClearColor(0.0f, 0.8f, 0.8f, 1.0f);
     bool loop = true;
-    Vector oneMove(0, 0, 0.1f);
+
     while(loop) {
         render();
-        if(one.position.z >= -1.5f) {
-            oneMove.z = -0.1f;
-            for(char i = 0; i < 16; i++) {
-                map[i] = rand() % 16;
-            }
-            two.texture.tile(16, map, mapw, mapw, &tileset);
+        if(keys['W'] && one.position.y < 1.5f) {
+            one.Translate(0, 0.1f, 0.f);
         }
-        else if(one.position.z <= -6.f) {
-            oneMove.z = 0.1f;
-            for(char i = 0; i < 4; i++) {
-                map[i] = 15;
-            }
-            two.texture.subTile(16, map, 16, 16, 2, 2, &tileset);
+        else if(keys['S'] && one.position.y > -1.5f) {
+            one.Translate(0, -0.1f, 0.f);
         }
-        one.Translate(oneMove);
-        //two.Rotate(1, 0, 0, 1);
+        if(keys['A'] && one.position.x > -1.5f) {
+            one.Translate(-0.1f, 0, 0.f);
+        }
+        if(keys['D'] && one.position.x < 1.5f) {
+            one.Translate(0.1f, 0, 0.f);
+        }
         Sleep(16);
         while(PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
             if(msg.message == WM_QUIT) {
@@ -122,13 +123,19 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         HGLRC context = wglGetCurrentContext();
         wglMakeCurrent(NULL, NULL);
         wglDeleteContext(context);
+        break;
     }
-                     break;
     case WM_SIZE:
         glViewport(0, 0, LOWORD(lParam), HIWORD(lParam));
         if(perMod) {
             perMod->perspective(90, LOWORD(lParam) / ((float)HIWORD(lParam)), 0.2f, 10);
         }
+        break;
+    case WM_KEYDOWN:
+        keys[wParam] = true;
+        break;
+    case WM_KEYUP:
+        keys[wParam] = false;
         break;
     default:
         return DefWindowProc(hWnd, message, wParam, lParam);

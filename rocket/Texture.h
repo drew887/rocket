@@ -31,11 +31,11 @@ namespace anGL {
         ~Texture();
         bool load(string location);
         void setImage(BMP& img);
-        void updateTexture();
         void setFilter(GLenum min, GLenum mag);
         void setWrap(GLenum wrap_S, GLenum wrap_T);
         void tile(uint8_t tileSize, uint16_t * tiles, uint16_t width, uint16_t height, BMP * source = NULL);
         void subTile(uint8_t tileSize, uint16_t * tiles, uint16_t xOffset, uint16_t yOffset, uint16_t width, uint16_t height, BMP * source);
+        void updateTexture();
 
         bool loaded;
         BMP image;

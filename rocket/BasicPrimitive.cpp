@@ -6,6 +6,7 @@ using namespace anGL;
 BasicPrimitive::BasicPrimitive(){
     glGenVertexArrays(1, &vertexArrayID);
     glGenBuffers(1, &vertexBufferID);
+    modelLoc = 0;
 }
 
 
@@ -24,6 +25,17 @@ void BasicPrimitive::Translate(Vector npos){
 
 void BasicPrimitive::Translate(float amountX, float amountY, float amountZ){
     Translate(Vector(amountX, amountY, amountZ));
+}
+
+void BasicPrimitive::setTranslate(Vector npos){
+    model.setTranslation(npos.x, npos.y, npos.z);
+    position.x = model.matrix[12];
+    position.y = model.matrix[13];
+    position.z = model.matrix[14];
+}
+
+void anGL::BasicPrimitive::setTranslate(float amountX, float amountY, float amountZ){
+    setTranslate(Vector(amountX, amountY, amountZ));
 }
 
 void BasicPrimitive::Rotate(float deg, float amountX, float amountY, float amountZ){
