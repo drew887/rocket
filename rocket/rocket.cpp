@@ -6,22 +6,22 @@
 #include "Program.h"
 #include "Matrix.h"
 #include "BasicQuad.h"
+#include "Sprite.h"
 
 #include <time.h>
 
-LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
-
-void render();
-
 using namespace anGL;
 
-HDC device;
+LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
-int uniformWorld;
+void keyLoop(int deltaTime);
+void render();
 
-BasicQuad * quad, *du;
+BasicPrimitive * character, *background;
 Matrix * perMod = NULL;
 bool keys[256] = { 0 };
+int uniformWorld, FPS = 16;
+HDC device;
 
 int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd) {
 #define winh 600
@@ -60,15 +60,15 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
     uniformWorld = glGetUniformLocation(prog.programID, "world");
     glUniformMatrix4fv(uniformWorld, 1, GL_FALSE, world.matrix);
 
-    BasicQuad one(1, 1);
-    quad = &one;
+    Sprite one(1, 1);
+    character = &one;
     one.Translate(0, 0, -3);
     one.texture.image.alphaMask = 0xFFFFFF;
     one.texture.load("vtr.bmp");
-    one.setLocs(prog.programID);
+    one.modelLoc = glGetUniformLocation(prog.programID, "model");
 
     BasicQuad two(4, 4);
-    du = &two;
+    background = &two;
     two.Translate(0, 0, -3.001f);
     two.setLocs(prog.programID);
 
@@ -87,29 +87,35 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
 
     glClearColor(0.0f, 0.8f, 0.8f, 1.0f);
     bool loop = true;
-
+    clock_t startTime = clock(), curTime, temp =0;
+    time_t currentTime = time(NULL);
+    unsigned int frames = 0;
+    int sleepTime = 0;
+//----------------->
     while(loop) {
-        render();
-        if(keys['W'] && one.position.y < 1.5f) {
-            one.Translate(0, 0.1f, 0.f);
-        }
-        else if(keys['S'] && one.position.y > -1.5f) {
-            one.Translate(0, -0.1f, 0.f);
-        }
-        if(keys['A'] && one.position.x > -1.5f) {
-            one.Translate(-0.1f, 0, 0.f);
-        }
-        if(keys['D'] && one.position.x < 1.5f) {
-            one.Translate(0.1f, 0, 0.f);
-        }
-        Sleep(16);
+        curTime = clock();
         while(PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
             if(msg.message == WM_QUIT) {
                 loop = false;
             }
             DispatchMessage(&msg);
         }
+        keyLoop(sleepTime);
+        render();
+        glFinish();
+        frames++;
+        temp = clock();
+        temp -= curTime;
+        sleepTime = FPS - temp;
+        if(sleepTime > 0) {
+            Sleep(sleepTime);
+        }
+        if(time(NULL) - currentTime >= 1) {
+            frames = 0;
+            currentTime = time(NULL);
+        }
     }
+//----------------->
     return 0;
 }
 
@@ -147,7 +153,53 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 void render() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glUniformMatrix4fv(uniformWorld, 1, GL_FALSE, perMod->matrix);
-    quad->Render();
-    du->Render();
+    character->Render();
+    background->Render();
     SwapBuffers(device);
+}
+void keyLoop(int deltaTime) {
+    Vector upMove;
+    float movement = 3 * (float(deltaTime) / CLOCKS_PER_SEC);
+    if(keys['W']) {
+        //character->Translate(0, 0.1f, 0.f);
+        upMove.y = movement;
+    }else if(keys['S']) {
+        //character->Translate(0, -0.1f, 0.f);
+        upMove.y = -movement;
+    }
+    if(keys['A']) {
+        //character->Translate(-0.1f, 0, 0.f);
+        upMove.x = -movement;
+    }else if(keys['D']) {
+        //character->Translate(0.1f, 0, 0.f);
+        upMove.x = movement;
+    }
+    if(keys[VK_ESCAPE] || keys['Q']) {
+        PostQuitMessage(0);
+    }
+    if(keys[VK_F1]) {
+        FPS = 16;
+        keys[VK_F1] = false;
+    }
+    if(keys[VK_F2]) {
+        FPS = 33;
+        keys[VK_F2] = false;
+    }
+    if(keys[VK_F3]) {
+        FPS = 66;
+        keys[VK_F3] = false;
+    }
+    character->Translate(upMove);
+    if(character->position.x > 1.f) {
+        character->setTranslate(1.f, character->position.y, character->position.z);
+    }
+    else if(character->position.x < -2.0f) {
+        character->setTranslate(-2.0f, character->position.y, character->position.z);
+    }
+    if(character->position.y > 1.0f) {
+        character->setTranslate(character->position.x, 1.0f, character->position.z);
+    }
+    else if(character->position.y < -2.0f) {
+        character->setTranslate(character->position.x, -2.0f, character->position.z);
+    }
 }

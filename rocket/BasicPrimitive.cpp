@@ -7,6 +7,7 @@ BasicPrimitive::BasicPrimitive(){
     glGenVertexArrays(1, &vertexArrayID);
     glGenBuffers(1, &vertexBufferID);
     modelLoc = 0;
+    verticies = 0;
 }
 
 
@@ -34,7 +35,7 @@ void BasicPrimitive::setTranslate(Vector npos){
     position.z = model.matrix[14];
 }
 
-void anGL::BasicPrimitive::setTranslate(float amountX, float amountY, float amountZ){
+void BasicPrimitive::setTranslate(float amountX, float amountY, float amountZ){
     setTranslate(Vector(amountX, amountY, amountZ));
 }
 
