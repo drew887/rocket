@@ -10,18 +10,20 @@ namespace anGL {
     protected:
         float * verticies;
         unsigned int vertexBufferID, vertexArrayID;
-        Matrix model;
+        Matrix model, mRotation, mScale, mTranslation;
     public:
         BasicPrimitive();
         virtual ~BasicPrimitive();
-        virtual void Render() = 0;
-        virtual void Translate(Vector npos);
-        virtual void Translate(float amountX, float amountY, float amountZ);
+        virtual void render() = 0;
+        virtual void update();
+        virtual void translate(Vector npos);
+        virtual void translate(float amountX, float amountY, float amountZ);
         virtual void setTranslate(Vector npos);
         virtual void setTranslate(float amountX, float amountY, float amountZ);
-        virtual void Rotate(float deg, float amountX, float amountY, float amountZ);
-        virtual void Scale(float amountX, float amountY, float amountZ);
-
+        virtual void rotate(float deg, float amountX, float amountY, float amountZ);
+        virtual void setRotate(float deg, float amountX, float amountY, float amountZ);
+        virtual void scale(float amountX, float amountY, float amountZ);
+        virtual void setScale(float amountX, float amountY, float amountZ);
         int modelLoc;
         Vector position;
     };

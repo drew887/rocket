@@ -30,8 +30,8 @@ Matrix& Matrix::operator=(const Matrix& rhs) {
 }
 
 Matrix Matrix::operator*(const Matrix& o) {
-    float * m = matrix;
-    float * p = o.matrix;
+    float * p = matrix;
+    float * m = o.matrix;
     Matrix result;
     //first row
     result[0] = ((m[0] * p[0]) + (m[1] * p[4]) + (m[2] * p[8]) + (m[3] * p[12]));

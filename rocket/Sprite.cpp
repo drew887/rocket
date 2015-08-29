@@ -3,18 +3,19 @@
 using namespace anGL;
 
 Sprite::Sprite(float nWidth, float nHeight):width(nWidth), height(nHeight) {
-
+    nWidth /= 2;
+    nHeight /= 2;
     verticies = new float[8]{
-        0, height,
-        0, 0,
-        width, height,
-        width, 0
+        -nWidth, -nHeight,
+        nWidth, -nHeight,
+        -nWidth, nHeight,
+        nWidth, nHeight
     };
     float texts[] = { //reversed tex coords 
-        0, 0,
         0, 1,
-        1, 0,
-        1, 1
+        1, 1,
+        0, 0,
+        1, 0
     };
 
     int current = 0;
@@ -41,7 +42,8 @@ Sprite::~Sprite(){
     glDeleteBuffers(1, &texCoordBufferID);
 }
 
-void anGL::Sprite::Render(){
+void anGL::Sprite::render(){
+    update();
     int current;
     glGetIntegerv(GL_VERTEX_ARRAY_BINDING, &current);
 

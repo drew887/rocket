@@ -11,7 +11,7 @@ namespace anGL {
     public:
         BasicQuad(float width, float height);
         virtual ~BasicQuad();
-        virtual void Render();
+        virtual void render();
         void setLocs(int programID);
         Texture texture;
         int sampleLoc;

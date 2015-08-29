@@ -17,10 +17,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 void keyLoop(int deltaTime);
 void render();
 
-BasicPrimitive * character, *background;
-Matrix * perMod = NULL;
+BasicPrimitive * character, *background, *reference;
+Matrix * perMod = NULL, *cam;
 bool keys[256] = { 0 };
-int uniformWorld, FPS = 16;
+int uniformWorld, uniformCam, FPS = 16;
 HDC device;
 
 int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd) {
@@ -48,50 +48,65 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
     prog.linkProgram();
     glUseProgram(prog.programID);
     glEnable(GL_DEPTH_TEST);
-    glEnable(GL_CULL_FACE);
+    //glEnable(GL_CULL_FACE);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+    
+    Matrix camera;
+    cam = &camera;
+    uniformCam = glGetUniformLocation(prog.programID, "camera");
+    glUniformMatrix4fv(uniformCam, 1, GL_FALSE, camera.matrix);
+
     Matrix world;
-    //world.perspective(90, 1, 0.2f, 10);
+    world.perspective(90, 1, 0.2f, 50);
 #define squareS 3.f
-    world.orthographic(squareS, -squareS, -squareS, squareS, 0.2f, 10);
+    //world.orthographic(squareS, -squareS, -squareS, squareS, 0.2f, 10);
     perMod = &world;
     uniformWorld = glGetUniformLocation(prog.programID, "world");
     glUniformMatrix4fv(uniformWorld, 1, GL_FALSE, world.matrix);
 
     Sprite one(1, 1);
     character = &one;
-    one.Translate(0, 0, -3);
+    one.translate(0, 0, -3);
     one.texture.image.alphaMask = 0xFFFFFF;
     one.texture.load("vtr.bmp");
     one.modelLoc = glGetUniformLocation(prog.programID, "model");
 
     BasicQuad two(4, 4);
     background = &two;
-    two.Translate(0, 0, -3.001f);
+    two.translate(0, 0, -3.001f);
     two.setLocs(prog.programID);
+
+    BasicQuad floorr(4, 4);
+    reference = &floorr;
+    floorr.setLocs(prog.programID);
+    floorr.scale(1, 1, 0);
+    floorr.rotate(-90, 1, 0, 0);
+    floorr.translate(0, -1.5, -3);
 
     srand((int)time(NULL));
     unsigned short mapw = 4;
-    uint16_t map[16] = { 
+    uint16_t map[16] = {
         0, 1, 1, 2,
         3, 4, 4, 5,
         3, 4, 4, 5,
-        6, 7, 7, 8 
+        6, 7, 7, 8
     };
     BMP tileset("ship.bmp");
     two.texture.tile(16, map, mapw, mapw, &tileset);
-    
+    floorr.texture.tile(16, map, mapw, mapw, &tileset);
+
+
     MSG msg = { 0 };
 
     glClearColor(0.0f, 0.8f, 0.8f, 1.0f);
     bool loop = true;
-    clock_t startTime = clock(), curTime, temp =0;
+    clock_t startTime = clock(), curTime, temp = 0;
     time_t currentTime = time(NULL);
     unsigned int frames = 0;
     int sleepTime = 0;
-//----------------->
+    //----------------->
     while(loop) {
         curTime = clock();
         while(PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
@@ -100,6 +115,8 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
             }
             DispatchMessage(&msg);
         }
+        //floorr.rotate(-1, 1, 0, 0);
+        //floorr.rotate(-1, 0, 0, 1);
         keyLoop(sleepTime);
         render();
         glFinish();
@@ -115,7 +132,7 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
             currentTime = time(NULL);
         }
     }
-//----------------->
+    //----------------->
     return 0;
 }
 
@@ -134,7 +151,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     case WM_SIZE:
         glViewport(0, 0, LOWORD(lParam), HIWORD(lParam));
         if(perMod) {
-            perMod->perspective(90, LOWORD(lParam) / ((float)HIWORD(lParam)), 0.2f, 10);
+            perMod->perspective(360, LOWORD(lParam) / ((float)HIWORD(lParam)), 0.2f, 50);
         }
         break;
     case WM_KEYDOWN:
@@ -153,28 +170,32 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 void render() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glUniformMatrix4fv(uniformWorld, 1, GL_FALSE, perMod->matrix);
-    character->Render();
-    background->Render();
+    glUniformMatrix4fv(uniformCam, 1, GL_FALSE, cam->matrix);
+    character->render();
+    background->render();
+    reference->render();
     SwapBuffers(device);
 }
 void keyLoop(int deltaTime) {
     Vector upMove;
     float movement = 3 * (float(deltaTime) / CLOCKS_PER_SEC);
     if(keys['W']) {
-        //character->Translate(0, 0.1f, 0.f);
+        reference->rotate(1, 0, 1, 0);
         upMove.y = movement;
-    }else if(keys['S']) {
-        //character->Translate(0, -0.1f, 0.f);
+    }
+    else if(keys['S']) {
+        reference->rotate(-1, 0, 1, 0);
         upMove.y = -movement;
     }
     if(keys['A']) {
-        //character->Translate(-0.1f, 0, 0.f);
+        reference->rotate(1, 0, 0, 1);
         upMove.x = -movement;
-    }else if(keys['D']) {
-        //character->Translate(0.1f, 0, 0.f);
+    }
+    else if(keys['D']) {
+        reference->rotate(-1, 0, 0, 1);
         upMove.x = movement;
     }
-    if(keys[VK_ESCAPE] || keys['Q']) {
+    if(keys[VK_ESCAPE]) {
         PostQuitMessage(0);
     }
     if(keys[VK_F1]) {
@@ -186,20 +207,38 @@ void keyLoop(int deltaTime) {
         keys[VK_F2] = false;
     }
     if(keys[VK_F3]) {
-        FPS = 66;
+        FPS = 25;
         keys[VK_F3] = false;
     }
-    character->Translate(upMove);
-    if(character->position.x > 1.f) {
-        character->setTranslate(1.f, character->position.y, character->position.z);
+    character->translate(upMove);
+    if(character->position.x > 1.5f) {
+        character->setTranslate(1.5f, character->position.y, character->position.z);
     }
-    else if(character->position.x < -2.0f) {
-        character->setTranslate(-2.0f, character->position.y, character->position.z);
+    else if(character->position.x < -1.5f) {
+        character->setTranslate(-1.5f, character->position.y, character->position.z);
     }
-    if(character->position.y > 1.0f) {
-        character->setTranslate(character->position.x, 1.0f, character->position.z);
+    if(character->position.y > 1.5f) {
+        character->setTranslate(character->position.x, 1.5f, character->position.z);
     }
-    else if(character->position.y < -2.0f) {
-        character->setTranslate(character->position.x, -2.0f, character->position.z);
+    else if(character->position.y < -1.5f) {
+        character->setTranslate(character->position.x, -1.5f, character->position.z);
+    }
+    if(keys[VK_RIGHT]) {
+        cam->translate(-0.1f, 0, 0);
+    }
+    if(keys[VK_LEFT]) {
+        cam->translate(0.1f, 0, 0);
+    }
+    if(keys[VK_DOWN]) {
+        cam->translate(0, 0, -0.1f);
+    }
+    if(keys[VK_UP]) {
+        cam->translate(0, 0, 0.1f);
+    }
+    if(keys['Q']) {
+        character->rotate(-2, 0, 0, 1);
+    }
+    if(keys['E']) {
+        character->rotate(2, 0, 0, 1);
     }
 }

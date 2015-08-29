@@ -15,8 +15,9 @@ namespace anGL {
     public:
         Sprite(float width, float height);
         virtual ~Sprite();
-        virtual void Render();
+        virtual void render();
         Texture texture;
+        BMP spriteSheet;
         float width, height;
         Vector getDims();
     };

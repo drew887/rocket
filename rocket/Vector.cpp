@@ -1,4 +1,5 @@
 #include "Vector.h"
+#include "Matrix.h"
 #include <math.h>
 
 using namespace anGL;
@@ -20,6 +21,23 @@ Vector::Vector(const Vector & other) : x(points[0]), y(points[1]), z(points[2]),
 Vector::~Vector(){
 
 }
+
+Vector Vector::operator*(const Matrix & other) {
+    Vector result;
+    float * m = other.matrix;
+    result.x = (m[0] * x) + (m[1] * y) + (m[2] * z) + (m[3] * w);
+    result.y = (m[4] * x) + (m[5] * y) + (m[6] * z) + (m[7] * w);
+    result.z = (m[8] * x) + (m[9] * y) + (m[10] * z) + (m[11] * w);
+    result.w = (m[12] * x) + (m[13] * y) + (m[14] * z) + (m[15] * w);
+    return result;
+}
+
+Vector& Vector::operator*=(const Matrix & other) {
+    *this = *this * other;
+    return *this;
+}
+
+
 ////        ////
 // Vector ops //
 ////        ////

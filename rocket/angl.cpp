@@ -39,7 +39,7 @@ HWND anGL::createOpenGLWin(HINSTANCE hInstance, const wchar_t * windowName, int 
         0, 0, //These are the bitplanes and shift for our alpha buffer, we still want these to be 0 since we will be using openGL's instead
         0, //This is how many bitplanes in our accumulation buffer, we want 0
         0, 0, 0, 0, //These are the bitplanes for the RGBA in out accumulation buffer, 0 because we don't have an accumulation buffer
-        24, //This is the depth of our depth buffer (tee-hee) 24 or 16 seem to be the standard
+        16, //This is the depth of our depth buffer (tee-hee) 24 or 16 seem to be the standard
         8, //This is the depth of out stencil buffer 8 seems to be pretty good
         0, //This is the number of auxillary buffers, windows doesn't support auxillary buffers at this time
         PFD_MAIN_PLANE, //This is actually not needed and is ignored by windows now, but we stick it here for backwards compatability
