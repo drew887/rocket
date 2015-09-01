@@ -74,3 +74,24 @@ HWND anGL::createOpenGLWin(HINSTANCE hInstance, const wchar_t * windowName, int 
     return windowHandle;
 }
 
+#include <fstream>
+
+std::vector<uint16_t> anGL::readCSV(const char * loc) {
+    std::vector<uint16_t> result;
+    std::ifstream fin(loc);
+    if(fin.is_open()) {
+        int temp;
+        while(!fin.eof()) {
+            fin >> temp;
+            if(fin.fail()) {
+                fin.clear();
+                fin.ignore(1, ',');
+            }
+            else {
+                result.push_back(temp);
+            }
+        }
+    }
+    return result;
+}
+

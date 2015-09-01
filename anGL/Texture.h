@@ -12,7 +12,6 @@ namespace anGL {
         Image(string location);
         Image();
         Image(Image& other);
-        Image(Image&& other); //move constructor?
         bool loadBMP24(string location);
         Image subImage(uint32_t startX, uint32_t startY, uint32_t width, uint32_t height);
         bool subImage(uint32_t * destination, uint32_t startX, uint32_t startY, uint32_t width, uint32_t height);

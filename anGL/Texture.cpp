@@ -177,18 +177,6 @@ Image::Image(Image & other) {
     }
 }
 
-Image::Image(Image && other) {
-    width = other.width;
-    height = other.height;
-    size = width * height;
-    alphaMask = other.alphaMask;
-    image = other.image;
-    loaded = other.loaded;
-    other.image = NULL;
-    other.width = other.height = other.size = 0;
-    other.loaded = false;
-}
-
 Image::Image(string location) {
     alphaMask = 0xFF00FF;
     if(!loadBMP24(location)) { //error opening image, just create an empty 2 by 2 image
