@@ -17,7 +17,7 @@ namespace anGL {
         virtual ~Sprite();
         virtual void render();
         Texture texture;
-        BMP spriteSheet;
+        Image spriteSheet;
         float width, height;
         Vector getDims();
     };

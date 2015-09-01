@@ -46,7 +46,7 @@ Texture::~Texture() {
 
 bool Texture::load(string location) {
     bool result = false;
-    if(image.load(location)) {
+    if(image.loadBMP24(location)) {
         updateTexture();
         setFilter(GL_NEAREST, GL_NEAREST);
         setWrap(GL_CLAMP_TO_BORDER, GL_CLAMP_TO_BORDER);
@@ -57,12 +57,11 @@ bool Texture::load(string location) {
     return result;
 }
 
-void Texture::setImage(BMP& img) {
+void Texture::setImage(Image& img) {
     assert(img.loaded);
     if(img.loaded) {
         image = img;
-        glBindTexture(GL_TEXTURE_2D, texID);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, image.width, image.height, 0, GL_BGRA, GL_UNSIGNED_BYTE, image.image);
+        updateTexture();
         setFilter(GL_NEAREST, GL_NEAREST);
         setWrap(GL_CLAMP_TO_BORDER, GL_CLAMP_TO_BORDER);
         loaded = true;
@@ -72,7 +71,7 @@ void Texture::setImage(BMP& img) {
 void Texture::updateTexture(){
     if(image.loaded) {
         glBindTexture(GL_TEXTURE_2D, texID);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, image.width, image.height, 0, GL_BGRA, GL_UNSIGNED_BYTE, image.image);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, image.width, image.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image.image);
     }
 }
 
@@ -89,12 +88,12 @@ void Texture::setWrap(GLenum wrap_S, GLenum wrap_T) {
 }
 
 
-void Texture::tile(uint8_t tileSize, uint16_t * tiles, uint16_t width, uint16_t height, BMP * source) {
+void Texture::tile(uint8_t tileSize, uint16_t * tiles, uint16_t width, uint16_t height, Image * source) {
     if(source == NULL) {
         assert(loaded);
         source = &image;
     }
-    BMP result;
+    Image result;
     result.height = height * tileSize;
     result.width = width * tileSize;
     result.size = result.width * result.height;
@@ -121,7 +120,7 @@ void Texture::tile(uint8_t tileSize, uint16_t * tiles, uint16_t width, uint16_t 
     setImage(result);
 }
 
-void Texture::subTile(uint8_t tileSize, uint16_t * tiles, uint16_t xOffset, uint16_t yOffset, uint16_t width, uint16_t height, BMP * source){
+void Texture::subTile(uint8_t tileSize, uint16_t * tiles, uint16_t xOffset, uint16_t yOffset, uint16_t width, uint16_t height, Image * source){
     if(loaded) {
         if(source == NULL) {
             source = &image;
@@ -151,14 +150,14 @@ void Texture::subTile(uint8_t tileSize, uint16_t * tiles, uint16_t xOffset, uint
     }
 }
 
-BMP::BMP() {
+Image::Image() {
     loaded = false;
     image = NULL;
     width = height = size = 0;
     alphaMask = 0xFF00FF;
 }
 
-BMP::BMP(BMP & other) {
+Image::Image(Image & other) {
     if(other.loaded) {
         width = other.width;
         height = other.height;
@@ -178,7 +177,7 @@ BMP::BMP(BMP & other) {
     }
 }
 
-BMP::BMP(BMP && other) {
+Image::Image(Image && other) {
     width = other.width;
     height = other.height;
     size = width * height;
@@ -190,16 +189,16 @@ BMP::BMP(BMP && other) {
     other.loaded = false;
 }
 
-BMP::BMP(string location) {
+Image::Image(string location) {
     alphaMask = 0xFF00FF;
-    if(!load(location)) { //error opening image, just create an empty 2 by 2 image
+    if(!loadBMP24(location)) { //error opening image, just create an empty 2 by 2 image
         image = NULL;
         width = height = size = 0;
         loaded = false;
     }
 }
 
-bool BMP::load(string location) {
+bool Image::loadBMP24(string location) {
     bool result = false;
     BitmapFileInfo fileHeader;
     BitmapInfoHeader infoHeader;
@@ -226,7 +225,7 @@ bool BMP::load(string location) {
                     A = 0xFF;
                 }
                 invert = (height - 1) - i;
-                image[z + (invert*width)] = (A << 24 | r << 16 | g << 8 | b);
+                image[z + (invert*width)] = (A << 24 | b << 16 | g << 8 | r);
             }
         }
         fclose(fp);
@@ -237,8 +236,8 @@ bool BMP::load(string location) {
     return result;
 }
 
-BMP BMP::subImage(uint32_t startX, uint32_t startY, uint32_t subWidth, uint32_t subHeight) {
-    BMP result;
+Image Image::subImage(uint32_t startX, uint32_t startY, uint32_t subWidth, uint32_t subHeight) {
+    Image result;
     assert(loaded);
     assert((subWidth * subHeight <= size));
     assert(startX + subWidth <= width);
@@ -260,7 +259,7 @@ BMP BMP::subImage(uint32_t startX, uint32_t startY, uint32_t subWidth, uint32_t 
     return result;
 }
 
-bool BMP::subImage(uint32_t * destination, uint32_t startX, uint32_t startY, uint32_t subWidth, uint32_t subHeight) {
+bool Image::subImage(uint32_t * destination, uint32_t startX, uint32_t startY, uint32_t subWidth, uint32_t subHeight) {
     bool result = false;
     assert(loaded);
     assert((subWidth * subHeight <= size));
@@ -280,7 +279,7 @@ bool BMP::subImage(uint32_t * destination, uint32_t startX, uint32_t startY, uin
     return result;
 }
 
-BMP & BMP::operator=(BMP& other) {
+Image & Image::operator=(Image& other) {
     if(other.loaded) {
         width = other.width;
         height = other.height;
@@ -302,6 +301,6 @@ BMP & BMP::operator=(BMP& other) {
     return *this;
 }
 
-BMP::~BMP() {
+Image::~Image() {
     delete[] image;
 }

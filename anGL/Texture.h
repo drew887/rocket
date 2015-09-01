@@ -7,21 +7,21 @@
 
 using std::string;
 namespace anGL {
-    class BMP {
+    class Image {
     public:
-        BMP(string location);
-        BMP();
-        BMP(BMP& other);
-        BMP(BMP&& other); //move constructor?
-        bool load(string location);
-        BMP subImage(uint32_t startX, uint32_t startY, uint32_t width, uint32_t height);
+        Image(string location);
+        Image();
+        Image(Image& other);
+        Image(Image&& other); //move constructor?
+        bool loadBMP24(string location);
+        Image subImage(uint32_t startX, uint32_t startY, uint32_t width, uint32_t height);
         bool subImage(uint32_t * destination, uint32_t startX, uint32_t startY, uint32_t width, uint32_t height);
-        BMP& operator=(BMP& other);
+        Image& operator=(Image& other);
 
         uint32_t width, height, size, alphaMask;
         uint32_t * image;
         bool loaded;
-        ~BMP();
+        ~Image();
     };
 
     class Texture {
@@ -30,16 +30,16 @@ namespace anGL {
         Texture();
         ~Texture();
         bool load(string location);
-        void setImage(BMP& img);
+        void setImage(Image& img);
         void setFilter(GLenum min, GLenum mag);
         void setWrap(GLenum wrap_S, GLenum wrap_T);
-        void tile(uint8_t tileSize, uint16_t * tiles, uint16_t width, uint16_t height, BMP * source = NULL);
-        void subTile(uint8_t tileSize, uint16_t * tiles, uint16_t xOffset, uint16_t yOffset, uint16_t width, uint16_t height, BMP * source);
+        void tile(uint8_t tileSize, uint16_t * tiles, uint16_t width, uint16_t height, Image * source = NULL);
+        void subTile(uint8_t tileSize, uint16_t * tiles, uint16_t xOffset, uint16_t yOffset, uint16_t width, uint16_t height, Image * source);
         void updateTexture();
 
         bool loaded;
-        BMP image;
-        unsigned int texID, samplerID;
+        Image image;
+        unsigned int texID;
     };
 }
 #endif

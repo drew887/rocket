@@ -125,7 +125,7 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
         26,27,26,27,26,27,26,27,26,27,26,27,26,27,26,27,26,27,26,27,26,27,26,27,26,27,26,27,26,27,
         36,37,36,37,36,37,36,37,36,37,36,37,36,37,36,37,36,37,36,37,36,37,36,37,36,37,36,37,36,37
     };
-    BMP tileset("ship.bmp"), over("overworld.bmp");
+    Image tileset("ship.bmp"), over("overworld.bmp");
     floorr.texture.tile(16, map, mapw, mapw, &tileset);
     two.texture.tile(8, bmap, 30, 30, &over);
 
