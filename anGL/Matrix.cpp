@@ -1,4 +1,5 @@
 #include "Matrix.h"
+#include <math.h>
 
 using namespace anGL;
 
@@ -12,11 +13,7 @@ using namespace anGL;
 */
 Matrix::Matrix(float identity) {
     matrix = new float[16];
-    for(int i = 0; i < 16; i++) matrix[i] = 0;
-    matrix[0] = identity;
-    matrix[5] = identity;
-    matrix[10] = identity;
-    matrix[15] = identity;
+    setIdentity(identity);
 }
 
 Matrix::~Matrix() {
@@ -41,8 +38,8 @@ Matrix& Matrix::operator=(const Matrix& rhs) {
 }
 
 Matrix Matrix::operator*(const Matrix& o) {
-    float * m = matrix;
-    float * p = o.matrix;
+    float * p = matrix;
+    float * m = o.matrix;
     Matrix result;
     //first row
     result[0] = ((m[0] * p[0]) + (m[1] * p[4]) + (m[2] * p[8]) + (m[3] * p[12]));
@@ -77,15 +74,6 @@ float& Matrix::operator[](unsigned int offset) {
     return matrix[offset];
 }
 
-#include <math.h>
-#define PI 3.14159265f
-float anGL::degtorad(float deg) {
-    return deg * (PI / 180);
-}
-float anGL::radtodeg(float rad) {
-    return rad * (180 / PI);
-}
-
 ////        ////
 // View funcs //
 ////        ////
@@ -96,6 +84,7 @@ float anGL::radtodeg(float rad) {
     \param far where to stick the far clipping plane
 */
 void Matrix::perspective(float fieldOfView, float aspect, float near, float far) {
+    setIdentity(1.0f);
     float tanOfView = tanf(fieldOfView / 2.0f);
     matrix[0] = 1 / (aspect * tanOfView);
     matrix[5] = 1 / (tanOfView);
@@ -112,6 +101,7 @@ void Matrix::perspective(float fieldOfView, float aspect, float near, float far)
     although without a controlable field of view.
 */
 void Matrix::frustum(float top, float bottom, float left, float right, float near, float far) {
+    setIdentity(1.0f);
     matrix[0] = (2 * near) / (right - left);
     matrix[5] = (2 * near) / (top - bottom);
     matrix[8] = (right + left) / (right - left);
@@ -129,6 +119,7 @@ top, bottom, left, and right define the lengths of the 4 sides of the view. Defi
 no matter the depth all objects appear as if at the same depth
 */
 void Matrix::orthographic(float top, float bottom, float left, float right, float near, float far) {
+    setIdentity(1.0f);
     matrix[0] = 2 / (right - left);
     matrix[5] = 2 / (top - bottom);
     matrix[10] = -2 / (far - near);
@@ -211,3 +202,21 @@ void Matrix::setRotation(float rot, float rx, float ry, float rz){
     matrix[2] = (t * (rx*rz)) - (s*ry);
     matrix[6] = (t * (ry*rz)) + (s*rx);
 }
+
+void Matrix::setIdentity(float identity) {
+    for(int i = 0; i < 16; i++) {
+        matrix[i] = 0;
+    }
+    matrix[0] = identity;
+    matrix[5] = identity;
+    matrix[10] = identity;
+    matrix[15] = identity;
+}
+
+float anGL::degtorad(float deg) {
+    return deg * (3.14159265f / 180);
+}
+float anGL::radtodeg(float rad) {
+    return rad * (180 / 3.14159265f);
+}
+

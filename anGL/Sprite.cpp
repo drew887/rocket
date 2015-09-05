@@ -1,25 +1,17 @@
-#include "BasicQuad.h"
-#include <gl\glew.h>
+#include "Sprite.h"
+
 using namespace anGL;
-/*!
-    Creates a quad centered around the origin
-*/
-BasicQuad::BasicQuad(float width, float height, int programID) {
-    width /= 2;
-    height /= 2;
+
+Sprite::Sprite(float nWidth, float nHeight):width(nWidth), height(nHeight) {
+    nWidth /= 2;
+    nHeight /= 2;
     verticies = new float[8]{
-        -width, -height,
-        width, -height,
-        -width, height,
-        width, height
+        -nWidth, -nHeight,
+        nWidth, -nHeight,
+        -nWidth, nHeight,
+        nWidth, nHeight
     };
-    /*float texts[] = {
-        0, 0,
-        1, 0,
-        0, 1,
-        1, 1
-    };*/
-   float texts[] = { //reversed tex coords 
+    float texts[] = { //reversed tex coords 
         0, 1,
         1, 1,
         0, 0,
@@ -29,8 +21,6 @@ BasicQuad::BasicQuad(float width, float height, int programID) {
     int current = 0;
     glGetIntegerv(GL_VERTEX_ARRAY_BINDING, &current);
     glBindVertexArray(vertexArrayID);
-    
-    texture.load("type.bmp");
 
     glBindBuffer(GL_ARRAY_BUFFER, vertexBufferID);
     glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 8, verticies, GL_STATIC_DRAW);
@@ -43,31 +33,28 @@ BasicQuad::BasicQuad(float width, float height, int programID) {
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, 0);
     glEnableVertexAttribArray(1);
 
-    if(programID >= 0) {
-        modelLoc = glGetUniformLocation(programID, "model");
-        sampleLoc = glGetUniformLocation(programID, "sample");
-    }
-    
-    
     glBindVertexArray(current);
+
 }
 
-BasicQuad::~BasicQuad() {
+
+Sprite::~Sprite(){
     glDeleteBuffers(1, &texCoordBufferID);
 }
 
-void BasicQuad::Render() {
+void anGL::Sprite::render(){
+    update();
     int current;
     glGetIntegerv(GL_VERTEX_ARRAY_BINDING, &current);
 
     glBindVertexArray(vertexArrayID);
-    //model = trans *  rot * scale;
     glUniformMatrix4fv(modelLoc, 1, GL_FALSE, model.matrix);
-    
-    glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, texture.texID);
-    glUniform1i(sampleLoc, 0);
 
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     glBindVertexArray(current);
+}
+
+Vector anGL::Sprite::getDims() {
+    return Vector(width, height, 0) * mScale;
 }

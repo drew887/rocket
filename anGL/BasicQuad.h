@@ -10,9 +10,12 @@ namespace anGL {
     protected:
         unsigned int texCoordBufferID;
     public:
-        BasicQuad(float width, float height,  int uniformLoc = -1);
+        BasicQuad(float width, float height);
         virtual ~BasicQuad();
-        virtual void Render();
+        virtual void render();
+        void setLocs(int programID);
+        virtual Vector getDims();
+
         Texture texture;
         int sampleLoc;
     };

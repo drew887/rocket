@@ -1,7 +1,9 @@
 #pragma once
 #ifndef ANGL_VECTOR_H
 #define ANGL_VECTOR_H
+
 namespace anGL {
+    class Matrix;
     //!Represents a 4 point vector
     class Vector{
 
@@ -9,6 +11,9 @@ namespace anGL {
         Vector(float X = 0., float Y = 0., float Z = 0., float W = 1.);
         Vector(const Vector& other);
         ~Vector();
+
+        Vector operator*(const Matrix& other);
+        Vector& operator*=(const Matrix& other);
 
         //vector ops
         Vector& operator=(const Vector& other);
@@ -37,6 +42,8 @@ namespace anGL {
         float dot4(const Vector other) const; //full 4 point dot product
         //! returns the cross product of other and this as a direction, aka the w component is 0
         Vector cross(const Vector other) const;
+        void normalize();
+        float magnitude();
 
         float points[4];
         float &x, &y, &z, &w;

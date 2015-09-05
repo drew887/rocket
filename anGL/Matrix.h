@@ -14,6 +14,7 @@ namespace anGL {
         Matrix& operator*=(const Matrix& other);
         float& operator[](unsigned int offset);
         
+        void setIdentity(float identity);
         //! Generates a perspective matrix, makes things look like they do in the real world
         void perspective(float fieldOfView, float aspect, float nearPlane, float farPlane);
         //! Generates a frustrum matrix, like the perspective one but without the eyeball effect
