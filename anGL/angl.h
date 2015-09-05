@@ -10,8 +10,9 @@
 
 //! main namespace for Rocket
 namespace anGL {
-	//! used to create an openGL 3.3 window
+	//! used to create an openGL window
     HWND createOpenGLWin(HINSTANCE hInstance, const wchar_t * windowName, int width, int height, const int * attribs,LRESULT(CALLBACK *windowCallback)(HWND, UINT, WPARAM, LPARAM));
+    //! creates a vector full of tile indexes from a file full of csv
     std::vector<uint16_t> readCSV(const char * loc);
 }
 

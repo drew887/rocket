@@ -2,7 +2,13 @@
 #include <fstream>
 
 using namespace anGL;
-
+/*!
+    \param hInstance the HINSTANCE passed to your programs WinMain
+    \param windowName the title that you want to be displayed on the window, also what the class is registered as
+    \param attribs an array of attributes passed to wglCreateContextAttribsARB when creating the openGL context. This is where you would specify things such as the openGL version
+    \param windowCallback the callback function for the window, used to handle events 
+    \returns a HWND handle to the window
+*/
 HWND anGL::createOpenGLWin(HINSTANCE hInstance, const wchar_t * windowName, int width, int height, const int * attribs,LRESULT(CALLBACK *windowCallback)(HWND, UINT, WPARAM, LPARAM)) {
     
     WNDCLASS windowClass = { 0 };
@@ -74,7 +80,9 @@ HWND anGL::createOpenGLWin(HINSTANCE hInstance, const wchar_t * windowName, int 
 
     return windowHandle;
 }
-
+/*!
+    reads uint16_t values out of a file located at loc and pumps them into a vector. Usefull for tilemaps generated with programs like Tiled(C) that export to CSV.
+*/
 std::vector<uint16_t> anGL::readCSV(const char * loc) {
     std::vector<uint16_t> result;
     std::ifstream fin(loc);

@@ -14,7 +14,7 @@ namespace anGL {
         virtual ~BasicQuad();
         virtual void render();
         void setLocs(int programID);
-        virtual Vector getDims();
+        virtual Vector getDims(); //! returns a Vector representing the width, height, and depth of the Quad, as scaled by mScale.
 
         Texture texture;
         int sampleLoc;

@@ -53,7 +53,6 @@ void BasicQuad::render() {
     glBindVertexArray(vertexArrayID);
     glUniformMatrix4fv(modelLoc, 1, GL_FALSE, model.matrix);
     
-
     //glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, texture.texID);
     glUniform1i(sampleLoc, 0);

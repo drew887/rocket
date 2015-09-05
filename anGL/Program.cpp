@@ -7,7 +7,6 @@ Program::Program(){
     programID = glCreateProgram();
 }
 
-
 Program::~Program(){
     for(unsigned int ctr = 0; ctr < shaders.size(); ctr++) {
         glDetachShader(programID, shaders[ctr]  );
