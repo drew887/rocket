@@ -56,5 +56,5 @@ void anGL::Sprite::render(){
 }
 
 Vector anGL::Sprite::getDims() {
-    return Vector(width, height, 0);
+    return Vector(width, height, 0) * mScale;
 }

@@ -13,6 +13,8 @@ namespace anGL {
         virtual ~BasicQuad();
         virtual void render();
         void setLocs(int programID);
+        virtual Vector getDims();
+
         Texture texture;
         int sampleLoc;
     };

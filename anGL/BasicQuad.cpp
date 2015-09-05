@@ -62,3 +62,7 @@ void BasicQuad::setLocs(int programID) {
     modelLoc = glGetUniformLocation(programID, "model");
     sampleLoc = glGetUniformLocation(programID, "sample");
 }
+
+Vector anGL::BasicQuad::getDims() {
+    return Vector(width, height, 0) * mScale;
+}

@@ -193,34 +193,36 @@ bool Image::loadBMP24(string location) {
     FILE * fp = fopen(location.c_str(), "rb");
     if(fp) {
         fread(&fileHeader, sizeof(BitmapFileInfo), 1, fp);
-        fread(&infoHeader, sizeof(BitmapInfoHeader), 1, fp);
-        fseek(fp, fileHeader.bitoffset, SEEK_SET);
-        width = infoHeader.width;
-        height = infoHeader.height;
-        size = width * height;
-        this->image = new uint32_t[size];
-        uint8_t r, g, b, A = 0xFF;
-        int invert = 0;
-        for(uint32_t i = 0; i < height; i++) {
-            for(uint32_t z = 0; z < width; z++) {
-                fread(&b, 1, 1, fp);
-                fread(&g, 1, 1, fp);
-                fread(&r, 1, 1, fp);
-                if((r << 16 | g << 8 | b) == alphaMask) {
-                    A = 0;
+        if(!strncmp((char*)fileHeader.type, "BM", 2)) {
+            fread(&infoHeader, sizeof(BitmapInfoHeader), 1, fp);
+            assert(!(infoHeader.bitcount == 24));
+            fseek(fp, fileHeader.bitoffset, SEEK_SET);
+            width = infoHeader.width;
+            height = infoHeader.height;
+            size = width * height;
+            this->image = new uint32_t[size];
+            uint8_t r, g, b, A = 0xFF;
+            int invert = 0;
+            for(uint32_t i = 0; i < height; i++) {
+                for(uint32_t z = 0; z < width; z++) {
+                    fread(&b, 1, 1, fp);
+                    fread(&g, 1, 1, fp);
+                    fread(&r, 1, 1, fp);
+                    if((r << 16 | g << 8 | b) == alphaMask) {
+                        A = 0;
+                    }
+                    else {
+                        A = 0xFF;
+                    }
+                    invert = (height - 1) - i;
+                    image[z + (invert*width)] = (A << 24 | b << 16 | g << 8 | r);
                 }
-                else {
-                    A = 0xFF;
-                }
-                invert = (height - 1) - i;
-                image[z + (invert*width)] = (A << 24 | b << 16 | g << 8 | r);
             }
+            fclose(fp);
+            loaded = true;
+            result = true;
         }
-        fclose(fp);
-        loaded = true;
-        result = true;
     }
-
     return result;
 }
 

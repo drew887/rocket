@@ -1,4 +1,5 @@
 #include "angl.h"
+#include <fstream>
 
 using namespace anGL;
 
@@ -73,8 +74,6 @@ HWND anGL::createOpenGLWin(HINSTANCE hInstance, const wchar_t * windowName, int 
 
     return windowHandle;
 }
-
-#include <fstream>
 
 std::vector<uint16_t> anGL::readCSV(const char * loc) {
     std::vector<uint16_t> result;

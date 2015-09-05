@@ -24,8 +24,10 @@ namespace anGL {
         virtual void setRotate(float deg, float amountX, float amountY, float amountZ);
         virtual void scale(float amountX, float amountY, float amountZ);
         virtual void setScale(float amountX, float amountY, float amountZ);
+        virtual Vector getDims() = 0;
         int modelLoc;
         Vector position;
+        float width, height;
     };
 }
 #endif

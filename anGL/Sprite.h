@@ -19,7 +19,7 @@ namespace anGL {
         Texture texture;
         Image spriteSheet;
         float width, height;
-        Vector getDims();
+        virtual Vector getDims();
     };
 }
 #endif

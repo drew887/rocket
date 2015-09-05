@@ -7,6 +7,8 @@
 #include "Matrix.h"
 #include "BasicQuad.h"
 #include "Sprite.h"
+#include "Map.h"
+
 
 #include <time.h>
 
@@ -17,7 +19,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 void keyLoop(int deltaTime);
 void render();
 
-BasicPrimitive * character, *background, *reference;
+BasicPrimitive * character;
+BasicMap * back;
 Matrix * perMod = NULL, *cam;
 bool keys[256] = { 0 };
 int uniformWorld, uniformCam, FPS = 16;
@@ -47,7 +50,7 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
     prog.attachShader(&frag);
     prog.linkProgram();
     glUseProgram(prog.programID);
-    glEnable(GL_DEPTH_TEST);
+    //glEnable(GL_DEPTH_TEST);
     //glEnable(GL_CULL_FACE);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -66,46 +69,32 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
     uniformWorld = glGetUniformLocation(prog.programID, "world");
     glUniformMatrix4fv(uniformWorld, 1, GL_FALSE, world.matrix);
 
-    Sprite one(1, 1);
-    character = &one;
-    one.translate(0, 0, -3);
-    one.texture.image.alphaMask = 0xFFFFFF;
-    one.texture.load("vtr.bmp");
-    one.modelLoc = glGetUniformLocation(prog.programID, "model");
-
-    BasicQuad two(15, 15);
-    background = &two;
-    two.translate(0, 0, -3.001f);
-    two.setLocs(prog.programID);
-
-    BasicQuad floorr(4, 4);
-    reference = &floorr;
-    floorr.setLocs(prog.programID);
-    floorr.scale(1, 1, 0);
-    floorr.rotate(-90, 1, 0, 0);
-    floorr.translate(0, -1.5, -3);
-
     srand((int)time(NULL));
-    unsigned short mapw = 4;
-    uint16_t map[16] = {
-        0, 1, 1, 2,
-        3, 4, 4, 5,
-        3, 4, 4, 5,
-        6, 7, 7, 8
-    };
-    vector<uint16_t> cmap = readCSV("overworld.csv");
-    Image tileset("ship.bmp"), over("overworld.bmp");
-    floorr.texture.tile(16, map, mapw, mapw, &tileset);
-    two.texture.tile(8, cmap.data(), 30, 30, &over);
 
+    vector<uint16_t> cmap = readCSV("overworld.csv");
+    Image over("overworld.bmp");
+
+    TiledMap backMap(15, 15, over);
+    back = &backMap;
+    backMap.background.texture.tile(8, cmap.data(), 30, 30, &over);
+    backMap.background.translate(0, 0, -3);
+    backMap.setModelLocation(prog.programID, "model");
+    
+    Sprite * tempS = new Sprite(1, 1);
+    character = tempS;
+    tempS->texture.image.alphaMask = 0xFFFFFF;
+    tempS->texture.load("vtr.bmp");
+    tempS->translate(0, 0, -3.f);
+
+    backMap.addPrimitives(1, tempS);
 
     MSG msg = { 0 };
 
     glClearColor(0.0f, 0.8f, 0.8f, 1.0f);
+    
     bool loop = true;
     clock_t startTime = clock(), curTime, temp = 0;
     time_t currentTime = time(NULL);
-    unsigned int frames = 0;
     int sleepTime = 0;
     //----------------->
     while(loop) {
@@ -116,21 +105,14 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
             }
             DispatchMessage(&msg);
         }
-        //floorr.rotate(-1, 1, 0, 0);
-        //floorr.rotate(-1, 0, 0, 1);
         keyLoop(sleepTime);
         render();
         glFinish();
-        frames++;
         temp = clock();
         temp -= curTime;
         sleepTime = FPS - temp;
         if(sleepTime > 0) {
             Sleep(sleepTime);
-        }
-        if(time(NULL) - currentTime >= 1) {
-            frames = 0;
-            currentTime = time(NULL);
         }
     }
     //----------------->
@@ -172,9 +154,7 @@ void render() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glUniformMatrix4fv(uniformWorld, 1, GL_FALSE, perMod->matrix);
     glUniformMatrix4fv(uniformCam, 1, GL_FALSE, cam->matrix);
-    character->render();
-    background->render();
-    reference->render();
+    back->render();
     SwapBuffers(device);
 }
 void keyLoop(int deltaTime) {
@@ -208,34 +188,37 @@ void keyLoop(int deltaTime) {
         keys[VK_F3] = false;
     }
     character->translate(upMove);
-    if(character->position.x > 1.5f) {
-        character->setTranslate(1.5f, character->position.y, character->position.z);
+#define dimLim 7
+    if(character->position.x > dimLim) {
+        character->setTranslate(dimLim, character->position.y, character->position.z);
     }
-    else if(character->position.x < -1.5f) {
-        character->setTranslate(-1.5f, character->position.y, character->position.z);
+    else if(character->position.x < -dimLim) {
+        character->setTranslate(-dimLim, character->position.y, character->position.z);
     }
-    if(character->position.y > 1.5f) {
-        character->setTranslate(character->position.x, 1.5f, character->position.z);
+    if(character->position.y > dimLim) {
+        character->setTranslate(character->position.x, dimLim, character->position.z);
     }
-    else if(character->position.y < -1.5f) {
-        character->setTranslate(character->position.x, -1.5f, character->position.z);
+    else if(character->position.y < -dimLim) {
+        character->setTranslate(character->position.x, -dimLim, character->position.z);
     }
+
+    float cameraMovement = 6 * (float(deltaTime) / CLOCKS_PER_SEC);
     if(keys[VK_RIGHT]) {
-        cam->translate(-0.1f, 0, 0);
+        cam->translate(-cameraMovement, 0, 0);
     }
     if(keys[VK_LEFT]) {
-        cam->translate(0.1f, 0, 0);
+        cam->translate(cameraMovement, 0, 0);
     }
     if(keys[VK_DOWN]) {
-        cam->translate(0, 0.1f, 0.f);
+        cam->translate(0, cameraMovement, 0.f);
     }
     if(keys[VK_UP]) {
-        cam->translate(0, -0.1f, 0.f);
+        cam->translate(0, -cameraMovement, 0.f);
     }
     if(keys['Q']) {
-        cam->translate(0, 0, 0.1f);
+        cam->translate(0, 0, cameraMovement);
     }
     if(keys['E']) {
-        cam->translate(0, 0, -0.1f);
+        cam->translate(0, 0, -cameraMovement);
     }
 }
