@@ -28,7 +28,6 @@ struct BitmapInfoHeader {//Bitmap Info Header
 };
 #pragma pack()
 
-
 Texture::Texture(string location) {
     glGenTextures(1, &texID);
     load(location);
@@ -42,7 +41,6 @@ Texture::Texture() {
 Texture::~Texture() {
     glDeleteTextures(1, &texID);
 }
-
 
 bool Texture::load(string location) {
     bool result = false;
@@ -86,7 +84,6 @@ void Texture::setWrap(GLenum wrap_S, GLenum wrap_T) {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrap_S);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrap_T);
 }
-
 
 void Texture::tile(uint8_t tileSize, uint16_t * tiles, uint16_t width, uint16_t height, Image * source) {
     if(source == NULL) {
@@ -179,7 +176,7 @@ Image::Image(Image & other) {
 
 Image::Image(string location) {
     alphaMask = 0xFF00FF;
-    if(!loadBMP24(location)) { //error opening image, just create an empty 2 by 2 image
+    if(!loadBMP24(location)) { //error opening image
         image = NULL;
         width = height = size = 0;
         loaded = false;

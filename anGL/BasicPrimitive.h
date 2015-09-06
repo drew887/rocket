@@ -11,6 +11,7 @@ namespace anGL {
         float * verticies;
         unsigned int vertexBufferID, vertexArrayID;
         Matrix model, mRotation, mScale, mTranslation;
+        float width, height, depth;
     public:
         BasicPrimitive();
         virtual ~BasicPrimitive();
@@ -27,7 +28,6 @@ namespace anGL {
         virtual Vector getDims() = 0;
         int modelLoc;
         Vector position;
-        float width, height;
     };
 }
 #endif

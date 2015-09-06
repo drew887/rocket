@@ -2,15 +2,17 @@
 #include <gl\glew.h>
 using namespace anGL;
 
-BasicQuad::BasicQuad(float width, float height) {
-    width /= 2;
-    height /= 2;
+BasicQuad::BasicQuad(float nWidth, float nHeight){
+    nWidth /= 2;
+    nHeight /= 2;
     verticies = new float[8]{
-        -width, -height,
-        width, -height,
-        -width, height,
-        width, height
+        -nWidth, -nHeight,
+        nWidth, -nHeight,
+        -nWidth, nHeight,
+        nWidth, nHeight
     };
+    width = nWidth;
+    height = nHeight;
    float texts[] = { //reversed tex coords 
         0, 1,
         1, 1,
@@ -33,7 +35,6 @@ BasicQuad::BasicQuad(float width, float height) {
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, 0);
     glEnableVertexAttribArray(1);
 
-    sampleLoc = 0;
     glBindVertexArray(current);
 }
 
@@ -48,19 +49,10 @@ void BasicQuad::render() {
 
     glBindVertexArray(vertexArrayID);
     glUniformMatrix4fv(modelLoc, 1, GL_FALSE, model.matrix);
-    
-
-    //glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, texture.texID);
-    glUniform1i(sampleLoc, 0);
 
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     glBindVertexArray(current);
-}
-
-void BasicQuad::setLocs(int programID) {
-    modelLoc = glGetUniformLocation(programID, "model");
-    sampleLoc = glGetUniformLocation(programID, "sample");
 }
 
 Vector anGL::BasicQuad::getDims() {

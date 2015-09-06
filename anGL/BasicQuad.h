@@ -12,11 +12,9 @@ namespace anGL {
         BasicQuad(float width, float height);
         virtual ~BasicQuad();
         virtual void render();
-        void setLocs(int programID);
         virtual Vector getDims();
 
         Texture texture;
-        int sampleLoc;
     };
 }
 

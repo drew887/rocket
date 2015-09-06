@@ -4,22 +4,17 @@
 
 #include <gl\glew.h>
 
-#include "BasicPrimitive.h"
+#include "BasicQuad.h"
 #include "Texture.h"
 #include "Vector.h"
 
 namespace anGL {
-    class Sprite : public BasicPrimitive {
-    protected:
-        unsigned int texCoordBufferID;
+    class Sprite : public BasicQuad {
     public:
         Sprite(float width, float height);
         virtual ~Sprite();
-        virtual void render();
-        Texture texture;
+
         Image spriteSheet;
-        float width, height;
-        virtual Vector getDims();
     };
 }
 #endif
