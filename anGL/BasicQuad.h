@@ -1,3 +1,10 @@
+/*----------------------------------------------*\
+|                                                |
+|                  BasicQuad.h                   |
+| BasicQuad is a child class of BasicPrimitive   |
+| that is supposed to represent a simple square  |
+| centered around the origin with a texture.     |
+\*----------------------------------------------*/
 #pragma once
 #ifndef ANGL_BASICQUAD_H
 #define ANGL_BASICQUAD_H

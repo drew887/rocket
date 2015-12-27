@@ -1,3 +1,19 @@
+/*-------------------------------------------------*\
+|                                                   |
+|                    Texture.h                      |
+| Image is a class designed to hold 32bit RGBA data.|
+| Currently only has support for reading in 24bit   |
+| BMP's.                                            |
+|                                                   |
+| Also contains support for pulling sub images and  |
+| setting of an alphamask before reading in an image|
+| to have it set the alpha when that colour is read |
+| to zero.                                          |
+|                                                   |
+| Texture is a class meant to ease the creation and |
+| handling of openGL textures. Has support for      |
+| tiling and subtiling regions of the texture.      |
+\*-------------------------------------------------*/
 #pragma once
 #ifndef ANGL_TEXTURE_H
 #define ANGL_TEXTURE_H

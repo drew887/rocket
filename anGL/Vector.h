@@ -1,3 +1,9 @@
+/*--------------------------------------------*\
+|                                              |
+|                   Vector.h                   |
+| A simple vector class. Not high level physics|
+| compatible, but suits small 3d apps          |
+\*--------------------------------------------*/
 #pragma once
 #ifndef ANGL_VECTOR_H
 #define ANGL_VECTOR_H

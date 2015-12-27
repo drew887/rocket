@@ -10,7 +10,6 @@ BasicPrimitive::BasicPrimitive(){
     verticies = 0;
 }
 
-
 BasicPrimitive::~BasicPrimitive(){
     delete[] verticies;
     glDeleteBuffers(1, &vertexBufferID);
@@ -18,7 +17,7 @@ BasicPrimitive::~BasicPrimitive(){
 }
 
 void anGL::BasicPrimitive::update(){
-    model = (mTranslation * mScale * mRotation);
+    model = (mTranslation * mScale * mRotation); //generate a matrix in a sane order
 }
 
 void BasicPrimitive::translate(Vector npos){

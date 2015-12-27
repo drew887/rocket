@@ -13,7 +13,7 @@ BasicQuad::BasicQuad(float nWidth, float nHeight){
     };
     width = nWidth;
     height = nHeight;
-   float texts[] = { //reversed tex coords 
+   float texts[] = { //reversed tex coords to adjust for how openGL UV coordinates work, rather than just flipping all our texture data
         0, 1,
         1, 1,
         0, 0,
@@ -45,7 +45,7 @@ BasicQuad::~BasicQuad() {
 void BasicQuad::render() {
     update();
     int current;
-    glGetIntegerv(GL_VERTEX_ARRAY_BINDING, &current);
+    glGetIntegerv(GL_VERTEX_ARRAY_BINDING, &current); // This is just to make sure we put things back to the way they were beforehand
 
     glBindVertexArray(vertexArrayID);
     glUniformMatrix4fv(modelLoc, 1, GL_FALSE, model.matrix);

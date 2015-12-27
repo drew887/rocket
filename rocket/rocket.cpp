@@ -1,3 +1,19 @@
+/*- -----------------------------------------------*\
+|                                                   |
+|                   rocket.cpp                      |
+| This is just a demo of what you can do with anGL. |
+| It aims to present a Final Fantasy style RPG map  |
+|                                                   |
+| anGL is basically just a helper library, it tries |
+| to interfere as little as possible while still    |
+| giving you come classes such as sprites and quads |
+| if you want those kinds of things.                |
+|                                                   |
+| It can be used for as little as opening an openGL |
+| window, or as far as this demo shows. At this     |
+| time there aren't classes for handling 3D models  |
+| but the idea is definitely on the table.          |
+\*-------------------------------------------------*/
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <gl\glew.h>
@@ -96,7 +112,6 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
     clock_t startTime = clock(), curTime, temp = 0;
     time_t currentTime = time(NULL);
     int sleepTime = 0;
-    //----------------->
     while(loop) {
         curTime = clock();
         while(PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
@@ -115,7 +130,6 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
             Sleep(sleepTime);
         }
     }
-    //----------------->
     return 0;
 }
 
@@ -157,7 +171,9 @@ void render() {
     back->render();
     SwapBuffers(device);
 }
+
 void keyLoop(int deltaTime) {
+    deltaTime = abs(deltaTime);
     Vector upMove;
     float movement = 3 * (float(deltaTime) / CLOCKS_PER_SEC);
     if(keys['W']) {
@@ -176,15 +192,15 @@ void keyLoop(int deltaTime) {
         PostQuitMessage(0);
     }
     if(keys[VK_F1]) {
-        FPS = 16;
+        FPS = 16; //60fps
         keys[VK_F1] = false;
     }
     if(keys[VK_F2]) {
-        FPS = 33;
+        FPS = 33; //30fps
         keys[VK_F2] = false;
     }
     if(keys[VK_F3]) {
-        FPS = 25;
+        FPS = 25; //40fps
         keys[VK_F3] = false;
     }
     character->translate(upMove);

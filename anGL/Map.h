@@ -1,3 +1,13 @@
+/*----------------------------------------------*\
+|                                                |
+|                      Map.h                     |
+| Just a small class to handle batch rendering of|
+| BasicPrimitives "on top" of a background, aka  |
+| after the background. It doesn't force them to |
+| be on top, its up to their Z coordinates if    |
+| Depth testing has been turned on, other wise   |
+| they will be on top of the background.         |
+\*----------------------------------------------*/
 #pragma once
 #ifndef ANGL_MAP_H
 #define ANGL_MAP_H

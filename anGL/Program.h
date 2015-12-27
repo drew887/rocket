@@ -1,3 +1,9 @@
+/*-----------------------------*\
+|                               |
+|           Program.h           |
+| A small class to handle openGL|
+| program and shader objects    |
+\*-----------------------------*/
 #pragma once
 #ifndef ANGL_PROGRAM_H
 #define ANGL_PROGRAM_H

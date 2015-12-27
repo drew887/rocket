@@ -1,3 +1,25 @@
+/*----------------------------------------------*\
+|                                                |
+|                 BasicPrimitive.h               |
+| BasicPrimitive is an abstract class providing  |
+| utility for the shape classes that are its     |
+| children.                                      |
+|                                                |
+| Children are required to define the render and |
+| getDims functions as that will be unique to    |
+| each shape.                                    |
+|                                                |
+| The verticies member is intended to be a       |
+| pointer to an array of floats representing the |
+| coordinates of the shape. It is up to the      |
+| child's constructor to allocate the memory but |
+| the BasicPrimitive destructor will delete the  |
+| array.                                         |
+|                                                |
+| This class also holds ids for a VBO and a VAO  |
+| which are created and destroyed in this class, |
+| no need to do so in the child classes.         |
+\*----------------------------------------------*/
 #pragma once
 #ifndef ANGL_BASICPRIMITIVE_H
 #define ANGL_BASICPRIMITIVE_H

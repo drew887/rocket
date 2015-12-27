@@ -1,9 +1,14 @@
+/*-------------------------------------*\
+|                                       |
+|                Matrix.h               |
+| A simple class for handling matricies.|
+| Isn't as complete as it could be but  |
+| it's usefull for basic 3d needs       |
+\*-------------------------------------*/
 #pragma once
 #ifndef ANGL_MATRIX_H
 #define ANGL_MATRIX_H
 
-
-// a class for handling matricies!
 namespace anGL {
 
     class Matrix {
