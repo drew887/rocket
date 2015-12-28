@@ -1,6 +1,6 @@
 #include "Texture.h"
 #include <stdio.h>
-#include <gl\glew.h>
+#include <GL/glew.h>
 #include <assert.h>
 
 using namespace anGL;

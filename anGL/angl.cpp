@@ -2,7 +2,8 @@
 #include <fstream>
 
 using namespace anGL;
-
+#ifdef _WIN32
+#include <GL/wglew.h>
 HWND anGL::createOpenGLWin(HINSTANCE hInstance, const wchar_t * windowName, int width, int height, const int * attribs,LRESULT(CALLBACK *windowCallback)(HWND, UINT, WPARAM, LPARAM)) {
     
     WNDCLASS windowClass = { 0 };
@@ -74,6 +75,7 @@ HWND anGL::createOpenGLWin(HINSTANCE hInstance, const wchar_t * windowName, int 
 
     return windowHandle;
 }
+#endif //ifdef _WIN32
 
 std::vector<uint16_t> anGL::readCSV(const char * loc) {
     std::vector<uint16_t> result;

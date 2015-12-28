@@ -19,7 +19,7 @@
 #define ANGL_TEXTURE_H
 #include <string>
 #include <stdint.h>
-#include <gl\glew.h>
+#include <GL/glew.h>
 
 using std::string;
 namespace anGL {

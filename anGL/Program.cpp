@@ -1,5 +1,5 @@
 #include "Program.h"
-#include <gl\glew.h>
+#include <GL/glew.h>
 
 using namespace anGL;
 

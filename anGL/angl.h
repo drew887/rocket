@@ -20,12 +20,13 @@
 
 #include <Windows.h>
 #include <vector>
-#include <gl\glew.h>
-#include <gl\wglew.h>
 #include <ctype.h>
+#include <GL/glew.h>
 
 namespace anGL {
+#ifdef _WIN32
     HWND createOpenGLWin(HINSTANCE hInstance, const wchar_t * windowName, int width, int height, const int * attribs,LRESULT(CALLBACK *windowCallback)(HWND, UINT, WPARAM, LPARAM));
+#endif
     std::vector<uint16_t> readCSV(const char * loc); ///Reads in a csv of uint16_ts and returns a vector of the values, useful for tile maps
 }
 

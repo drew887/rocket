@@ -1,7 +1,9 @@
 #include "Shader.h"
-#include <gl\glew.h>
-#include <gl\wglew.h>
+#include <GL/glew.h>
+#include <vector>
+#include <fstream>
 
+using namespace std;
 using namespace anGL;
 
 Shader::Shader() {
@@ -12,9 +14,6 @@ Shader::~Shader() {
     glDeleteShader(shaderID);
 }
 
-#include <vector>
-#include <fstream>
-using namespace std;
 bool Shader::load(string path, int type) {
     bool result = true;
     fstream fin;

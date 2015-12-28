@@ -1,5 +1,5 @@
 #include "BasicQuad.h"
-#include <gl\glew.h>
+#include <GL/glew.h>
 using namespace anGL;
 
 BasicQuad::BasicQuad(float nWidth, float nHeight){

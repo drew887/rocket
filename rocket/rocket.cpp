@@ -16,7 +16,9 @@
 \*-------------------------------------------------*/
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
-#include <gl\glew.h>
+#include <time.h>
+#include <GL/glew.h>
+#include <GL/wglew.h>
 
 #include "angl.h"
 #include "Program.h"
@@ -24,9 +26,6 @@
 #include "BasicQuad.h"
 #include "Sprite.h"
 #include "Map.h"
-
-
-#include <time.h>
 
 using namespace anGL;
 
