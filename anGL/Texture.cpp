@@ -1,7 +1,8 @@
 #include "Texture.h"
 #include <stdio.h>
-#include <GL/glew.h>
 #include <assert.h>
+#include <string.h>
+#include <GL/glew.h>
 
 using namespace anGL;
 
@@ -96,7 +97,7 @@ void Texture::tile(uint8_t tileSize, uint16_t * tiles, uint16_t width, uint16_t 
     result.size = result.width * result.height;
     result.image = new uint32_t[result.size];
     uint32_t * tile = new uint32_t[tileSize * tileSize];
-    uint32_t current, xPlace, yPlace, tileX, tileY, tileNo = 0, numTiles = source->size / (tileSize*tileSize);
+    uint32_t current, xPlace, yPlace, tileX, tileY, numTiles = source->size / (tileSize*tileSize);
     for(uint16_t currentTile = 0; currentTile < height * width; currentTile++) {
         assert(tiles[currentTile] < numTiles);
         current = 0;
@@ -123,7 +124,7 @@ void Texture::subTile(uint8_t tileSize, uint16_t * tiles, uint16_t xOffset, uint
             source = &image;
         }
         uint32_t * tile = new uint32_t[tileSize * tileSize];
-        uint32_t current, xPlace, yPlace, tileX, tileY, tileNo = 0, numTiles = source->size / (tileSize*tileSize);
+        uint32_t current, xPlace, yPlace, tileX, tileY, numTiles = source->size / (tileSize*tileSize);
         for(uint16_t currentTile = 0; currentTile < height * width; currentTile++) {
             assert(tiles[currentTile] < numTiles);
             current = 0;
@@ -205,7 +206,7 @@ bool Image::loadBMP24(string location) {
                     fread(&b, 1, 1, fp);
                     fread(&g, 1, 1, fp);
                     fread(&r, 1, 1, fp);
-                    if((r << 16 | g << 8 | b) == alphaMask) {
+                    if((uint32_t)(r << 16 | g << 8 | b) == alphaMask) {
                         A = 0;
                     }
                     else {
@@ -253,7 +254,6 @@ bool Image::subImage(uint32_t * destination, uint32_t startX, uint32_t startY, u
     assert(startX + subWidth <= width);
     assert(startY + subHeight <= height);
     if(loaded && (subWidth * subHeight <= size)) {
-        uint32_t size = subWidth * subHeight;
         uint32_t * start = &image[startX + (startY*width)];
         uint32_t stride = width - subWidth;
         for(uint32_t yStride = 0; yStride < subHeight; yStride++) {
